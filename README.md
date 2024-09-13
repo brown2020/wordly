@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wordly - A Wordle-Inspired Game
 
-## Getting Started
+**Wordly** is a Wordle-inspired game built with Next.js, React, and Tailwind CSS. The game allows users to guess a 5-letter word in 6 attempts or less. It features different difficulty levels, hints, scoring, and visual effects to make the game more engaging and fun!
 
-First, run the development server:
+## Table of Contents
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- [Features](#features)
+- [Demo](#demo)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Game Rules](#game-rules)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+- [Contact](#contact)
+
+## Features
+
+- **Difficulty Levels**: Select between Easy, Medium, and Hard levels for varied challenges.
+- **Scoring System**: Earn points based on the number of attempts used to guess the word.
+- **Hints**: Use hints to reveal a letter in the word after three incorrect attempts.
+- **Visual Feedback**: Enjoy animations and visual effects for correct, incorrect, and partially correct guesses.
+- **Responsive Design**: Built with Tailwind CSS for a responsive and visually appealing layout.
+
+## Demo
+
+Check out a live demo of the game [here](https://wordlyapp.vercel.app).
+
+## Installation
+
+To run the project locally, follow these steps:
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/brown2020/wordly.git
+   cd wordly
+   ```
+
+2. **Install dependencies:**
+
+   Make sure you have [Node.js](https://nodejs.org/) installed, then run:
+
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server:**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser:**
+
+   Visit `http://localhost:3000` to see the game in action.
+
+## Usage
+
+1. **Start the Game:**
+
+   - Select a difficulty level (Easy, Medium, Hard) from the dropdown menu.
+   - The game will start with a word based on your selected difficulty.
+
+2. **Make Guesses:**
+
+   - Enter a 5-letter word in the input field.
+   - Press "Enter" or click the "Submit" button to make a guess.
+
+3. **Use Hints:**
+
+   - After three incorrect guesses, click the "Hint" button to reveal a letter in the word.
+
+4. **End Game:**
+   - The game ends when you guess the word correctly or exhaust all 6 attempts.
+   - Click "Start Over" to play again.
+
+## Game Rules
+
+- **Objective**: Guess the 5-letter word in 6 attempts or less.
+- **Hints**: Available after 3 incorrect attempts and limited to one per game.
+- **Scoring**: Points are awarded based on the number of attempts used to guess the word. Fewer attempts result in a higher score.
+
+## Project Structure
+
+The project structure is as follows:
+
+```
+/wordly
+│
+├── public
+│   └── favicon.ico
+│
+├── src
+│   ├── components
+│   │   └── WordlyMain.tsx
+│   ├── constants
+│   │   └── wordlist.ts
+│   └── pages
+│       └── index.tsx
+│
+├── styles
+│   └── globals.css
+│
+├── .gitignore
+├── README.md
+├── package.json
+└── tailwind.config.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Main Components
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **`WordlyMain.tsx`**: The main game component that handles game logic, state management, and UI.
+- **`wordlist.ts`**: Contains the list of words categorized by difficulty levels.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contributing
 
-## Learn More
+Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
 
-To learn more about Next.js, take a look at the following resources:
+1. Fork the repository.
+2. Create a new branch with a descriptive name (`git checkout -b feature/my-new-feature`).
+3. Make your changes and commit them (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/my-new-feature`).
+5. Open a pull request.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Please ensure your code adheres to the project's coding standards and conventions.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Acknowledgements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Inspired by the original Wordle game.
+- Built with [Next.js](https://nextjs.org/), [React](https://reactjs.org/), and [Tailwind CSS](https://tailwindcss.com/).
+
+## Contact
+
+For any questions or feedback, please contact [info@ignitechannel.com](mailto:info@ignitechannel.com).
+
+---
+
+Thank you for checking out Wordly! Enjoy the game!
