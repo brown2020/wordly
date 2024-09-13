@@ -1,7 +1,13 @@
 "use client";
 
 import { wordList } from "@/constants/wordlist";
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  ChangeEvent,
+  FormEvent,
+} from "react";
 
 export default function WordlyMain() {
   const [wordToGuess, setWordToGuess] = useState<string>("");
@@ -13,11 +19,8 @@ export default function WordlyMain() {
   const [animateShake, setAnimateShake] = useState<boolean>(false); // State for shake animation
   const [difficulty, setDifficulty] = useState<number>(1); // State for difficulty level
 
-  useEffect(() => {
-    startNewGame();
-  }, [difficulty]);
-
-  const startNewGame = () => {
+  // Using useCallback to memoize startNewGame function
+  const startNewGame = useCallback(() => {
     const filteredWords = wordList.filter(
       (word) => word.difficulty === difficulty
     ); // Filter words by selected difficulty
@@ -29,7 +32,11 @@ export default function WordlyMain() {
     setGameOver(false);
     setHintUsed(false);
     setAnimateShake(false);
-  };
+  }, [difficulty]);
+
+  useEffect(() => {
+    startNewGame();
+  }, [startNewGame]);
 
   const handleDifficultyChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setDifficulty(Number(event.target.value));
@@ -43,6 +50,7 @@ export default function WordlyMain() {
     event.preventDefault();
 
     if (currentGuess.length !== 5) {
+      console.log("Triggering shake animation");
       setAnimateShake(true); // Trigger shake animation
       setTimeout(() => setAnimateShake(false), 500); // Remove shake after 500ms
       return;
@@ -169,27 +177,6 @@ export default function WordlyMain() {
           Start Over
         </button>
       )}
-      {/* Tailwind CSS classes for animations */}
-      <style jsx>{`
-        .animate-shake {
-          animation: shake 0.5s;
-        }
-        @keyframes shake {
-          0%,
-          100% {
-            transform: translateX(0);
-          }
-          25% {
-            transform: translateX(-5px);
-          }
-          50% {
-            transform: translateX(5px);
-          }
-          75% {
-            transform: translateX(-5px);
-          }
-        }
-      `}</style>
     </div>
   );
 }
