@@ -1,6 +1,48 @@
+/* globals.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* globals.css - add these if not present */
+@keyframes flip {
+  0% {
+    transform: rotateX(0);
+    background-color: white;
+  }
+  45% {
+    transform: rotateX(90deg);
+    background-color: white;
+  }
+  55% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-flip {
+  animation: flip 0.6s ease-in-out;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.animate-pop {
+  animation: pop 0.1s ease-in-out;
+}
 
 @keyframes shake {
   0%,
@@ -10,11 +52,8 @@
   25% {
     transform: translateX(-5px);
   }
-  50% {
-    transform: translateX(5px);
-  }
   75% {
-    transform: translateX(-5px);
+    transform: translateX(5px);
   }
 }
 
