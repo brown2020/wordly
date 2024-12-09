@@ -30,69 +30,85 @@ export const useWordly = () => {
     });
   }, [state.difficulty, state.score]);
 
-  const handleKeyPress = useCallback(
+  const handleLetterInput = useCallback(
     (key: string) => {
-      if (state.gameOver) return;
-
-      if (
-        /^[a-zA-Z]$/.test(key) &&
-        state.currentGuess.length < CONSTANTS.WORD_LENGTH
-      ) {
+      if (state.currentGuess.length < CONSTANTS.WORD_LENGTH) {
         setState((prev) => ({
           ...prev,
           currentGuess: prev.currentGuess + key.toUpperCase(),
         }));
-        return;
-      }
-
-      if (key === "Backspace" && state.currentGuess.length > 0) {
-        setState((prev) => ({
-          ...prev,
-          currentGuess: prev.currentGuess.slice(0, -1),
-        }));
-        return;
-      }
-
-      if (
-        key === "Enter" &&
-        state.currentGuess.length === CONSTANTS.WORD_LENGTH
-      ) {
-        const isWinner = state.currentGuess === state.wordToGuess;
-        const newAttempts = [...state.attempts, state.currentGuess];
-        const isLastAttempt = newAttempts.length === CONSTANTS.MAX_ATTEMPTS;
-
-        setState((prev) => ({
-          ...prev,
-          attempts: newAttempts,
-          currentGuess: "",
-          currentRow: prev.currentRow + 1,
-          isRevealing: true,
-          isWinner, // Update isWinner based on the outcome
-          gameOver: isWinner || isLastAttempt,
-          score: isWinner
-            ? prev.score + CONSTANTS.POINTS_PER_ATTEMPT
-            : prev.score,
-        }));
-
-        if (isWinner || isLastAttempt) {
-          setTimeout(() => {
-            setState((prev) => ({
-              ...prev,
-              isRevealing: false,
-              gameOver: true,
-            }));
-          }, 1500);
-        } else {
-          setTimeout(() => {
-            setState((prev) => ({
-              ...prev,
-              isRevealing: false,
-            }));
-          }, CONSTANTS.REVEAL_TIME_MS * CONSTANTS.WORD_LENGTH);
-        }
       }
     },
-    [state.currentGuess, state.attempts, state.wordToGuess, state.gameOver]
+    [state.currentGuess]
+  );
+
+  const handleBackspace = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      currentGuess: prev.currentGuess.slice(0, -1),
+    }));
+  }, []);
+
+  const updateGameState = useCallback(
+    (isWinner: boolean, newAttempts: string[]) => {
+      const isLastAttempt = newAttempts.length === CONSTANTS.MAX_ATTEMPTS;
+      const gameOver = isWinner || isLastAttempt;
+
+      setState((prev) => ({
+        ...prev,
+        attempts: newAttempts,
+        currentGuess: "",
+        currentRow: prev.currentRow + 1,
+        isRevealing: true,
+        isWinner,
+        gameOver,
+        score: isWinner
+          ? prev.score + CONSTANTS.POINTS_PER_ATTEMPT
+          : prev.score,
+      }));
+
+      const revealTime = gameOver
+        ? 1500
+        : CONSTANTS.REVEAL_TIME_MS * CONSTANTS.WORD_LENGTH;
+
+      setTimeout(() => {
+        setState((prev) => ({
+          ...prev,
+          isRevealing: false,
+          ...(gameOver && { gameOver: true }),
+        }));
+      }, revealTime);
+    },
+    []
+  );
+
+  const handleEnter = useCallback(() => {
+    if (state.currentGuess.length === CONSTANTS.WORD_LENGTH) {
+      const isWinner = state.currentGuess === state.wordToGuess;
+      const newAttempts = [...state.attempts, state.currentGuess];
+      updateGameState(isWinner, newAttempts);
+    }
+  }, [state.currentGuess, state.attempts, state.wordToGuess, updateGameState]);
+
+  const handleKeyPress = useCallback(
+    (key: string) => {
+      if (state.gameOver) return;
+
+      if (/^[a-zA-Z]$/.test(key)) {
+        handleLetterInput(key);
+      } else if (key === "Backspace" && state.currentGuess.length > 0) {
+        handleBackspace();
+      } else if (key === "Enter") {
+        handleEnter();
+      }
+    },
+    [
+      state.gameOver,
+      state.currentGuess,
+      handleLetterInput,
+      handleBackspace,
+      handleEnter,
+    ]
   );
 
   return {

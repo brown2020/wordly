@@ -6,6 +6,7 @@ interface GameOverModalProps {
   wordToGuess: string;
   numGuesses: number;
   onPlayAgain: () => void;
+  isOpen: boolean;
 }
 
 export const GameOverModal: FC<GameOverModalProps> = ({
@@ -13,7 +14,10 @@ export const GameOverModal: FC<GameOverModalProps> = ({
   wordToGuess,
   numGuesses,
   onPlayAgain,
+  isOpen,
 }) => {
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
