@@ -17,7 +17,13 @@ const GameRow: FC<{
   state: GameState;
   getLetterState: (rowIndex: number, colIndex: number) => LetterState;
 }> = ({ rowIndex, state, getLetterState }) => (
-  <div className="flex gap-1.5">
+  <div
+    className={`flex gap-1.5 ${
+      rowIndex === state.currentRow && state.invalidGuess
+        ? "[animation:var(--animate-shake)]"
+        : ""
+    }`}
+  >
     {[...Array(CONSTANTS.WORD_LENGTH)].map((_, colIndex) => {
       const letter =
         rowIndex === state.currentRow
@@ -32,6 +38,7 @@ const GameRow: FC<{
           isRevealing={state.isRevealing && rowIndex === state.currentRow - 1}
           position={colIndex}
           isCurrentRow={rowIndex === state.currentRow}
+          isInvalidGuess={rowIndex === state.currentRow && state.invalidGuess}
         />
       );
     })}
@@ -46,6 +53,7 @@ export const GameBoard: FC<GameBoardProps> = ({ state }) => {
     if (!attempt) return LetterState.UNUSED;
 
     const letter = attempt[colIndex];
+    if (!letter) return LetterState.UNUSED;
 
     // Check for correct position first
     if (letter === state.wordToGuess[colIndex]) {
@@ -54,21 +62,26 @@ export const GameBoard: FC<GameBoardProps> = ({ state }) => {
 
     // Check for present but in wrong position
     if (state.wordToGuess.includes(letter)) {
+      // Count how many times the letter appears in the target word
       const targetCount = countLetterOccurrences(state.wordToGuess, letter);
-      const correctCount = countLetterOccurrences(
-        attempt
-          .slice(0, CONSTANTS.WORD_LENGTH)
-          .split("")
-          .filter((l, i) => state.wordToGuess[i] === l)
-          .join(""),
-        letter
-      );
-      const previousCount = countLetterOccurrences(
-        attempt.slice(0, colIndex),
-        letter
-      );
 
-      if (previousCount + correctCount < targetCount) {
+      // Count how many times the letter appears in correct positions in the attempt
+      const correctPositions = [...attempt]
+        .map((l, i) =>
+          l === letter && state.wordToGuess[i] === letter ? 1 : 0
+        )
+        .reduce((sum: number, val: number) => sum + val, 0);
+
+      // Count how many times the letter appears in the wrong positions before this position
+      const previousWrongPositions = [...attempt]
+        .slice(0, colIndex)
+        .map((l, i) =>
+          l === letter && state.wordToGuess[i] !== letter ? 1 : 0
+        )
+        .reduce((sum: number, val: number) => sum + val, 0);
+
+      // If we haven't exceeded the target count considering correct positions and previous wrong positions
+      if (correctPositions + previousWrongPositions < targetCount) {
         return LetterState.PRESENT;
       }
     }

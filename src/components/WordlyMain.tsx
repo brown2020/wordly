@@ -1,7 +1,7 @@
 // WordlyMain.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { GameOverModal } from "@/components/GameOverModal";
 import { GameHeader } from "@/components/GameHeader";
@@ -12,11 +12,18 @@ import { STYLES } from "@/constants/constants";
 export default function WordlyMain() {
   const { state, handleKeyPress, startNewGame } = useWordly();
   const [showModal, setShowModal] = useState(false);
+  const startNewGameRef = useRef(startNewGame);
 
-  // Initialize game
+  // Update the ref when startNewGame changes
   useEffect(() => {
-    startNewGame();
+    startNewGameRef.current = startNewGame;
   }, [startNewGame]);
+
+  // Initialize game only once when component mounts
+  useEffect(() => {
+    startNewGameRef.current();
+    // Empty dependency array ensures this only runs once on mount
+  }, []);
 
   // Handle keyboard input
   useKeyboardInput(handleKeyPress);
@@ -28,10 +35,10 @@ export default function WordlyMain() {
     }
   }, [state.gameOver]);
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = useCallback(() => {
     setShowModal(false);
     startNewGame();
-  };
+  }, [startNewGame]);
 
   return (
     <div className={STYLES.LAYOUT.CONTAINER}>

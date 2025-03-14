@@ -8,6 +8,7 @@ interface GameTileProps {
   isRevealing: boolean;
   position: number;
   isCurrentRow: boolean;
+  isInvalidGuess?: boolean;
 }
 
 const STATE_STYLES: Record<LetterState, string> = {
@@ -26,16 +27,18 @@ export const GameTile: FC<GameTileProps> = ({
   isRevealing,
   position,
   isCurrentRow,
+  isInvalidGuess = false,
 }) => {
   const getStateClasses = (): string => {
+    if (isInvalidGuess) return "border-red-500";
     if (!letter) return "border-gray-300";
     if (isCurrentRow) return "border-gray-500";
     return STATE_STYLES[state] ?? "border-gray-300";
   };
 
   const getAnimationClass = (): string => {
-    if (isRevealing) return "animate-flip";
-    if (letter && isCurrentRow) return "animate-pop";
+    if (isRevealing) return "[animation:var(--animate-flip)]";
+    if (letter && isCurrentRow) return "[animation:var(--animate-pop)]";
     return "";
   };
 

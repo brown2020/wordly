@@ -14,6 +14,7 @@ export interface GameState {
   difficulty: 1 | 2 | 3;
   currentRow: number;
   isRevealing: boolean;
+  invalidGuess?: boolean;
 }
 
 export enum LetterState {
