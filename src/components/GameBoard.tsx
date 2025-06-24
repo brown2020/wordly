@@ -1,16 +1,14 @@
 // components/GameBoard.tsx
 import { FC } from "react";
-import { CONSTANTS } from "../constants/constants";
+import { GAME } from "@/constants/constants";
 import { GameTile } from "./GameTile";
-import { LetterState, GameState } from "../types/types";
+import { GameState } from "@/types/types";
 
 interface GameBoardProps {
   state: GameState;
 }
 
-// Helper function to count letter occurrences
-const countLetterOccurrences = (word: string, letter: string): number =>
-  [...word].filter((l) => l === letter).length;
+type LetterState = "correct" | "present" | "absent" | "unused";
 
 const GameRow: FC<{
   rowIndex: number;
@@ -24,7 +22,7 @@ const GameRow: FC<{
         : ""
     }`}
   >
-    {[...Array(CONSTANTS.WORD_LENGTH)].map((_, colIndex) => {
+    {[...Array(GAME.WORD_LENGTH)].map((_, colIndex) => {
       const letter =
         rowIndex === state.currentRow
           ? state.currentGuess[colIndex] || ""
@@ -47,51 +45,54 @@ const GameRow: FC<{
 
 export const GameBoard: FC<GameBoardProps> = ({ state }) => {
   const getLetterState = (rowIndex: number, colIndex: number): LetterState => {
-    if (rowIndex >= state.currentRow) return LetterState.UNUSED;
+    if (rowIndex >= state.currentRow) return "unused";
 
     const attempt = state.attempts[rowIndex];
-    if (!attempt) return LetterState.UNUSED;
+    if (!attempt) return "unused";
 
     const letter = attempt[colIndex];
-    if (!letter) return LetterState.UNUSED;
+    if (!letter) return "unused";
 
     // Check for correct position first
     if (letter === state.wordToGuess[colIndex]) {
-      return LetterState.CORRECT;
+      return "correct";
     }
 
     // Check for present but in wrong position
     if (state.wordToGuess.includes(letter)) {
-      // Count how many times the letter appears in the target word
-      const targetCount = countLetterOccurrences(state.wordToGuess, letter);
+      // Count how many times this letter appears in the target word
+      const targetCount = state.wordToGuess
+        .split("")
+        .filter((l) => l === letter).length;
 
-      // Count how many times the letter appears in correct positions in the attempt
-      const correctPositions = [...attempt]
-        .map((l, i) =>
-          l === letter && state.wordToGuess[i] === letter ? 1 : 0
-        )
-        .reduce((sum: number, val: number) => sum + val, 0);
+      // Count how many times we've already marked this letter as correct
+      const correctPositions = attempt
+        .split("")
+        .filter((l, i) => l === letter && l === state.wordToGuess[i]).length;
 
-      // Count how many times the letter appears in the wrong positions before this position
-      const previousWrongPositions = [...attempt]
+      // Count how many times we've marked this letter as present in previous positions
+      const previousWrongPositions = attempt
         .slice(0, colIndex)
-        .map((l, i) =>
-          l === letter && state.wordToGuess[i] !== letter ? 1 : 0
-        )
-        .reduce((sum: number, val: number) => sum + val, 0);
+        .split("")
+        .filter(
+          (l, i) =>
+            l === letter &&
+            l !== state.wordToGuess[i] &&
+            state.wordToGuess.includes(l)
+        ).length;
 
       // If we haven't exceeded the target count considering correct positions and previous wrong positions
       if (correctPositions + previousWrongPositions < targetCount) {
-        return LetterState.PRESENT;
+        return "present";
       }
     }
 
-    return LetterState.ABSENT;
+    return "absent";
   };
 
   return (
     <div className="flex flex-col gap-1.5 p-4">
-      {[...Array(CONSTANTS.MAX_ATTEMPTS)].map((_, rowIndex) => (
+      {[...Array(GAME.MAX_ATTEMPTS)].map((_, rowIndex) => (
         <GameRow
           key={rowIndex}
           rowIndex={rowIndex}

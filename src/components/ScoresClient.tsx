@@ -1,10 +1,29 @@
 "use client";
 
-import { useScores } from "@/hooks/useScores";
+import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 
+type ScoreData = {
+  score: number;
+  date: string;
+  attempts: number;
+  word: string;
+};
+
 export default function ScoresClient() {
-  const { scores } = useScores();
+  const [scores, setScores] = useState<ScoreData[]>([]);
+
+  // Load scores from localStorage
+  useEffect(() => {
+    try {
+      const savedScores = localStorage.getItem("wordly-scores");
+      if (savedScores) {
+        setScores(JSON.parse(savedScores));
+      }
+    } catch (error) {
+      console.error("Error loading scores:", error);
+    }
+  }, []);
 
   if (scores.length === 0) {
     return (
@@ -68,7 +87,7 @@ export default function ScoresClient() {
                   {score.word}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {score.guesses}/6
+                  {score.attempts}/6
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {score.score}

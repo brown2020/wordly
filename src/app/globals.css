@@ -2,55 +2,143 @@
 
 @import "tailwindcss";
 
+/* Import beautiful fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  @keyframes shake {
-    "0%, 100%": {
-      transform: "translateX(0)";
-    }
-    ,
-    "10%, 30%, 50%, 70%, 90%": {
-      transform: "translateX(-5px)";
-    }
-    ,
-    "20%, 40%, 60%, 80%": {
-      transform: "translateX(5px)";
-    }
-  }
-
-  @keyframes flip {
-    "0%": {
-      transform: "rotateX(0)";
-    }
-    ,
-    "50%": {
-      transform: "rotateX(90deg)";
-    }
-    ,
-    "100%": {
-      transform: "rotateX(0)";
-    }
-  }
-
-  @keyframes pop {
-    "0%": {
-      transform: "scale(1)";
-    }
-    ,
-    "50%": {
-      transform: "scale(1.1)";
-    }
-    ,
-    "100%": {
-      transform: "scale(1)";
-    }
-  }
-
-  --animate-shake: shake 0.5s ease-in-out;
-  --animate-flip: flip 0.5s ease-in-out;
-  --animate-pop: pop 0.2s ease-in-out;
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --default-font-family: Inter, system-ui, sans-serif;
+  --default-font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  --default-font-variation-settings: normal;
+  --default-mono-font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
-/* The default border color has changed to currentColor in Tailwind CSS v4 */
+/* Base styles for elegant design */
+html {
+  font-family: var(--default-font-family);
+  scroll-behavior: smooth;
+  font-feature-settings: var(--default-font-feature-settings);
+}
+
+body {
+  background: linear-gradient(135deg, #fafafa 0%, #ffffff 50%, #f0f9ff 100%);
+  color: #262626;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+/* Beautiful focus styles */
+*:focus {
+  outline: none;
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, [role="button"] {
+  transition: all var(--default-transition-duration) var(--default-transition-timing-function);
+}
+
+/* Elegant card styling */
+.card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-elevated {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  box-shadow: 0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Beautiful gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #0284c7 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Game tile animations */
+.tile-flip {
+  animation: flip 0.6s ease-in-out;
+}
+
+.tile-reveal {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Success celebration */
+.celebrate {
+  animation: confetti 0.8s ease-out;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flip {
+  0% { transform: rotateY(0); }
+  50% { transform: rotateY(90deg); }
+  100% { transform: rotateY(0); }
+}
+
+@keyframes confetti {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+@keyframes bounceGentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Text selection styling */
+::selection {
+  background: #bae6fd;
+  color: #0c4a6e;
+}
+
+/* Custom scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 #f5f5f5;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}

@@ -1,25 +1,22 @@
 // components/GameTile.tsx
 import { FC } from "react";
-import { LetterState } from "../types/types";
+import { TILE_STYLES } from "../constants/constants";
 
 interface GameTileProps {
   letter: string;
-  state: LetterState;
+  state: string; // "correct" | "present" | "absent" | "unused"
   isRevealing: boolean;
   position: number;
   isCurrentRow: boolean;
   isInvalidGuess?: boolean;
 }
 
-const STATE_STYLES: Record<LetterState, string> = {
-  [LetterState.CORRECT]: "bg-emerald-500 text-white border-emerald-500",
-  [LetterState.PRESENT]: "bg-amber-400 text-white border-amber-400",
-  [LetterState.ABSENT]: "bg-gray-500 text-white border-gray-500",
-  [LetterState.UNUSED]: "border-gray-300",
+const STATE_STYLES: Record<string, string> = {
+  correct: TILE_STYLES.correct,
+  present: TILE_STYLES.present,
+  absent: TILE_STYLES.absent,
+  unused: TILE_STYLES.empty,
 } as const;
-
-const BASE_CLASSES =
-  "w-16 h-16 border-2 flex items-center justify-center text-2xl font-bold uppercase transition-colors duration-150";
 
 export const GameTile: FC<GameTileProps> = ({
   letter,
@@ -30,19 +27,25 @@ export const GameTile: FC<GameTileProps> = ({
   isInvalidGuess = false,
 }) => {
   const getStateClasses = (): string => {
-    if (isInvalidGuess) return "border-red-500";
-    if (!letter) return "border-gray-300";
-    if (isCurrentRow) return "border-gray-500";
-    return STATE_STYLES[state] ?? "border-gray-300";
+    if (isInvalidGuess) return "border-red-400 bg-red-50 text-red-700 animate-shake";
+    if (!letter) return TILE_STYLES.empty;
+    if (isCurrentRow && letter) return TILE_STYLES.current;
+    if (letter && state === "unused") return TILE_STYLES.filled; // Filled but not yet evaluated
+    return STATE_STYLES[state] ?? TILE_STYLES.empty;
   };
 
   const getAnimationClass = (): string => {
-    if (isRevealing) return "[animation:var(--animate-flip)]";
-    if (letter && isCurrentRow) return "[animation:var(--animate-pop)]";
+    if (isRevealing) return "tile-flip";
+    if (letter && isCurrentRow) return "animate-bounce-gentle";
     return "";
   };
 
-  const classes = [BASE_CLASSES, getStateClasses(), getAnimationClass()]
+  const classes = [
+    TILE_STYLES.base, 
+    getStateClasses(), 
+    getAnimationClass(),
+    "select-none cursor-default"
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -50,7 +53,8 @@ export const GameTile: FC<GameTileProps> = ({
     <div
       className={classes}
       style={{
-        transitionDelay: isRevealing ? `${position * 300}ms` : "0ms",
+        transitionDelay: isRevealing ? `${position * 150}ms` : "0ms",
+        animationDelay: isRevealing ? `${position * 150}ms` : "0ms",
       }}
     >
       {letter}

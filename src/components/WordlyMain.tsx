@@ -1,113 +1,113 @@
 // WordlyMain.tsx
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GameBoard } from "@/components/GameBoard";
 import { GameOverModal } from "@/components/GameOverModal";
 import { GameHeader } from "@/components/GameHeader";
 import StatsModal from "@/components/StatsModal";
-import { useWordly } from "@/hooks/useWordly";
-import { useScores } from "@/hooks/useScores";
-import { useKeyboardInput } from "@/hooks/useKeyboardInput";
-import { STYLES } from "@/constants/constants";
+import { useGame } from "@/contexts/GameContext";
+import { LAYOUT, BUTTON } from "@/constants/constants";
 
 export default function WordlyMain() {
-  const { state, handleKeyPress, startNewGame } = useWordly();
-  const { saveScore } = useScores();
+  const { state, handleKeyPress, startNewGame, saveScore } = useGame();
   const [showModal, setShowModal] = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const startNewGameRef = useRef(startNewGame);
-
-  // Update the ref when startNewGame changes
-  useEffect(() => {
-    startNewGameRef.current = startNewGame;
-  }, [startNewGame]);
-
-  // Initialize game only once when component mounts
-  useEffect(() => {
-    startNewGameRef.current();
-    // Empty dependency array ensures this only runs once on mount
-  }, []);
 
   // Handle keyboard input
-  useKeyboardInput(handleKeyPress);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      handleKeyPress(event.key);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyPress]);
 
   // Handle game over state
   useEffect(() => {
     if (state.gameOver) {
       setShowModal(true);
 
-      // Save score when game is over
+      // Save score when game is won
       if (state.isWinner) {
         saveScore(state.score, state.attempts.length, state.wordToGuess);
 
         // Update stats API
         fetch("/api/stats", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             won: true,
             guesses: state.attempts.length,
           }),
-        }).catch((error) => {
-          console.error("Error updating stats:", error);
-        });
+        }).catch((error) => console.error("Error updating stats:", error));
       } else {
         // Update stats API for loss
         fetch("/api/stats", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             won: false,
             guesses: 0,
           }),
-        }).catch((error) => {
-          console.error("Error updating stats:", error);
-        });
+        }).catch((error) => console.error("Error updating stats:", error));
       }
     }
-  }, [
-    state.gameOver,
-    state.isWinner,
-    state.score,
-    state.attempts.length,
-    state.wordToGuess,
-    saveScore,
-  ]);
+  }, [state.gameOver, state.isWinner, state.score, state.attempts.length, state.wordToGuess, saveScore]);
 
-  const handlePlayAgain = useCallback(() => {
+  const handlePlayAgain = () => {
     setShowModal(false);
     startNewGame();
-  }, [startNewGame]);
+  };
 
   return (
-    <div className={STYLES.LAYOUT.CONTAINER}>
-      <GameHeader score={state.score} />
+    <div className={LAYOUT.container}>
+      {/* Elegant header card */}
+      <div className="card mb-8">
+        <GameHeader score={state.score} />
+      </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
-        <GameBoard state={state} />
-        <div className="mt-4 text-sm text-gray-600">
-          Attempts: {state.attempts.length}/6
+      {/* Main game area */}
+      <main className="flex-1 flex flex-col items-center justify-center">
+        {/* Game board with beautiful card styling */}
+        <div className="card-elevated p-8 mb-8">
+          <GameBoard state={state} />
+          
+          {/* Attempts counter with elegant styling */}
+          <div className="mt-6 text-center">
+            <div className="inline-flex items-center px-4 py-2 bg-neutral-100 rounded-full">
+              <span className="text-sm font-medium text-neutral-600">
+                Attempts: 
+              </span>
+              <span className="ml-2 text-sm font-bold text-neutral-800">
+                {state.attempts.length}/6
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-6 flex space-x-4">
+        {/* Action buttons with beautiful styling */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
           <Link
             href="/scores"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className={`${BUTTON.secondary} flex-1 text-center`}
           >
-            View Score History
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Score History
           </Link>
 
           <button
             onClick={() => setShowStats(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className={`${BUTTON.accent} flex-1`}
           >
-            View Statistics
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Statistics
           </button>
         </div>
       </main>
