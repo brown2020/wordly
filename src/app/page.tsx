@@ -1,5 +1,3 @@
-"use client";
-
 import WordlyMain from "@/components/WordlyMain";
 
 export default function HomePage() {

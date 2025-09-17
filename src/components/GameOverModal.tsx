@@ -1,5 +1,6 @@
 // components/GameOverModal.tsx
 import { FC } from "react";
+import { getShareText, useGameStore } from "@/stores/game-store";
 
 interface GameOverModalProps {
   isWinner: boolean;
@@ -39,13 +40,48 @@ export const GameOverModal: FC<GameOverModalProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={onPlayAgain}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-        >
-          Play Again
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={onPlayAgain}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+          >
+            Play Again
+          </button>
+          <ShareButton />
+        </div>
       </div>
     </div>
+  );
+};
+
+const ShareButton = () => {
+  const { isWinner, guesses, evaluations, mode, solutionId } = useGameStore();
+  const share = async () => {
+    const text = getShareText({
+      isWinner,
+      guesses,
+      evaluations,
+      mode,
+      solutionId,
+    });
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Results copied to clipboard!");
+    } catch {
+      // Fallback: open share dialog if available
+      if (navigator.share) {
+        try {
+          await navigator.share({ text });
+        } catch {}
+      }
+    }
+  };
+  return (
+    <button
+      onClick={share}
+      className="px-5 py-3 bg-neutral-800 text-white rounded-lg font-semibold"
+    >
+      Share
+    </button>
   );
 };

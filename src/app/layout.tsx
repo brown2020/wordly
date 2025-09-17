@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { GameProvider } from "@/contexts/GameContext";
 
 export const metadata: Metadata = {
   title: "Wordly - A Word Guessing Game",
@@ -40,29 +39,28 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className="h-full">
-        <GameProvider>
-          <div className="min-h-screen flex flex-col relative">
-            {/* Beautiful background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 -z-10" />
-            
-            <main className="flex-grow flex flex-col relative z-10">
-              {children}
-            </main>
-            
-            <footer className="relative z-10 bg-white/60 backdrop-blur-md border-t border-white/20 py-6">
-              <div className="max-w-4xl mx-auto px-6">
-                <div className="text-center">
-                  <p className="text-sm text-neutral-600 font-medium">
-                    Made with <span className="text-red-500">♥</span> by the Wordly Team
-                  </p>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    &copy; {new Date().getFullYear()} Wordly. All rights reserved.
-                  </p>
-                </div>
+        <div className="min-h-screen flex flex-col relative">
+          {/* Beautiful background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 -z-10" />
+
+          <main className="flex-grow flex flex-col relative z-10">
+            {children}
+          </main>
+
+          <footer className="relative z-10 bg-white/60 backdrop-blur-md border-t border-white/20 py-6">
+            <div className="max-w-4xl mx-auto px-6">
+              <div className="text-center">
+                <p className="text-sm text-neutral-600 font-medium">
+                  Made with <span className="text-red-500">♥</span> by the
+                  Wordly Team
+                </p>
+                <p className="text-xs text-neutral-500 mt-1">
+                  &copy; {new Date().getFullYear()} Wordly. All rights reserved.
+                </p>
               </div>
-            </footer>
-          </div>
-        </GameProvider>
+            </div>
+          </footer>
+        </div>
       </body>
     </html>
   );
