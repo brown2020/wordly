@@ -1,6 +1,7 @@
 // components/GameOverModal.tsx
 import { FC } from "react";
-import { getShareText, useGameStore } from "@/stores/game-store";
+import { useGameStore } from "@/stores/game-store";
+import { getShareText } from "@/utils/game-utils";
 
 interface GameOverModalProps {
   isWinner: boolean;
@@ -29,9 +30,8 @@ export const GameOverModal: FC<GameOverModalProps> = ({
         <div className="mb-6">
           <p className="text-lg mb-2">
             {isWinner
-              ? `You won in ${numGuesses} ${
-                  numGuesses === 1 ? "try" : "tries"
-                }!`
+              ? `You won in ${numGuesses} ${numGuesses === 1 ? "try" : "tries"
+              }!`
               : `Better luck next time!`}
           </p>
           <p className="text-md font-medium">
@@ -72,7 +72,7 @@ const ShareButton = () => {
       if (navigator.share) {
         try {
           await navigator.share({ text });
-        } catch {}
+        } catch { }
       }
     }
   };
