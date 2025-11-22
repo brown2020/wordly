@@ -1,16 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
-type GameStats = {
-  totalGames: number;
-  wins: number;
-  currentStreak: number;
-  maxStreak: number;
-  guessDistribution: {
-    [key: number]: number;
-  };
-};
+import { useMemo } from "react";
+import { useScores } from "@/hooks/useScores";
+import { calculateStats } from "@/utils/stats-utils";
 
 interface StatsModalProps {
   isOpen: boolean;
@@ -18,80 +10,12 @@ interface StatsModalProps {
 }
 
 export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
-  const [stats, setStats] = useState<GameStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  // Access store if needed in future
+  const { scores, loading } = useScores();
 
-  useEffect(() => {
-    if (!isOpen) return;
-    setLoading(true);
-    // Compute local stats from localStorage to persist across sessions
-    try {
-      type SavedScore = {
-        score: number;
-        attempts: number;
-        word: string;
-        date: string;
-      };
-      const scores: SavedScore[] = JSON.parse(
-        localStorage.getItem("wordly-scores") || "[]"
-      );
-      const totalGames: number = scores.length;
-      const wins: number = scores.filter(
-        (s: SavedScore) => s.attempts > 0
-      ).length; // heuristic
-      // Streaks: compute by consecutive days with wins
-      const byDay = new Map<string, boolean>();
-      for (const s of scores) {
-        const day = new Date(s.date).toISOString().slice(0, 10);
-        byDay.set(day, true);
-      }
-      const days = [...byDay.keys()].sort();
-      let maxStreak: number = 0;
-      let currentStreak: number = 0;
-      let prev: string | null = null;
-      for (const d of days) {
-        if (!prev) {
-          currentStreak = 1;
-        } else {
-          const prevDate: Date = new Date(prev);
-          const nextDate: Date = new Date(
-            prevDate.getTime() + 24 * 60 * 60 * 1000
-          );
-          const nextStr: string = nextDate.toISOString().slice(0, 10);
-          if (d === nextStr) {
-            currentStreak += 1;
-          } else {
-            currentStreak = 1;
-          }
-        }
-        prev = d;
-        maxStreak = Math.max(maxStreak, currentStreak);
-      }
-      const guessDistribution: Record<number, number> = {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-        6: 0,
-      };
-      for (const s of scores) {
-        if (s.attempts >= 1 && s.attempts <= 6) guessDistribution[s.attempts]++;
-      }
-      setStats({
-        totalGames,
-        wins,
-        currentStreak,
-        maxStreak,
-        guessDistribution,
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [isOpen]);
+  const stats = useMemo(() => {
+    if (!scores.length) return null;
+    return calculateStats(scores);
+  }, [scores]);
 
   if (!isOpen) return null;
 

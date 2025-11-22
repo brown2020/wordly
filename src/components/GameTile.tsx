@@ -1,5 +1,5 @@
 // components/GameTile.tsx
-import { FC } from "react";
+import { FC, memo } from "react";
 import { TILE_STYLES } from "../constants/constants";
 
 interface GameTileProps {
@@ -18,7 +18,7 @@ const STATE_STYLES: Record<string, string> = {
   unused: TILE_STYLES.empty,
 } as const;
 
-export const GameTile: FC<GameTileProps> = ({
+export const GameTile: FC<GameTileProps> = memo(({
   letter,
   state,
   isRevealing,
@@ -60,4 +60,6 @@ export const GameTile: FC<GameTileProps> = ({
       {letter}
     </div>
   );
-};
+});
+
+GameTile.displayName = "GameTile";
