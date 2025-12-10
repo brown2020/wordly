@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
-
-export type ScoreData = {
-  score: number;
-  date: string;
-  attempts: number;
-  word: string;
-};
+import { ScoreData } from "@/types/types";
+import { STORAGE_KEYS } from "@/constants/constants";
 
 export function useScores() {
   const [scores, setScores] = useState<ScoreData[]>([]);
@@ -13,7 +8,7 @@ export function useScores() {
 
   useEffect(() => {
     try {
-      const savedScores = localStorage.getItem("wordly-scores");
+      const savedScores = localStorage.getItem(STORAGE_KEYS.SCORES);
       if (savedScores) {
         setScores(JSON.parse(savedScores));
       }
@@ -26,4 +21,3 @@ export function useScores() {
 
   return { scores, loading };
 }
-

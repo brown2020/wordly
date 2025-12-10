@@ -3,15 +3,9 @@ import { useGameStore } from "@/stores/game-store";
 import { useGameStats } from "./useGameStats";
 
 export function useGameController() {
-  const {
-    guesses,
-    isGameOver,
-    isWinner,
-    answer,
-    handleKey,
-    startNewGame,
-  } = useGameStore();
-  
+  const { guesses, isGameOver, isWinner, answer, handleKey, startNewGame } =
+    useGameStore();
+
   const [showModal, setShowModal] = useState(false);
 
   // Handle stats persistence
@@ -48,7 +42,6 @@ export function useGameController() {
 
   return {
     showModal,
-    setShowModal,
     handlePlayAgain,
     guesses,
     isWinner,

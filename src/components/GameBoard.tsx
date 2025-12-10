@@ -1,39 +1,33 @@
 // components/GameBoard.tsx
-import { FC } from "react";
+import { FC, memo } from "react";
 import { GAME } from "@/constants/constants";
 import { GameTile } from "./GameTile";
 import { useGameStore } from "@/stores/game-store";
+import { LetterState } from "@/types/types";
 
-type LetterState = "correct" | "present" | "absent" | "unused";
+const GameRow: FC<{ rowIndex: number }> = memo(({ rowIndex }) => {
+  const currentRow = useGameStore((s) => s.currentRow);
+  const invalidGuess = useGameStore((s) => s.invalidGuess);
+  const currentGuess = useGameStore((s) => s.currentGuess);
+  const guess = useGameStore((s) => s.guesses[rowIndex]);
+  const evaluation = useGameStore((s) => s.evaluations[rowIndex]);
+  const isRevealing = useGameStore((s) => s.isRevealing);
 
-const GameRow: FC<{ rowIndex: number }> = ({ rowIndex }) => {
-  const {
-    currentRow,
-    invalidGuess,
-    currentGuess,
-    guesses,
-    isRevealing,
-    evaluations,
-  } = useGameStore();
+  const isCurrent = rowIndex === currentRow;
 
   return (
     <div
       className={`flex gap-1.5 ${
-        rowIndex === currentRow && invalidGuess
-          ? "[animation:var(--animate-shake)]"
-          : ""
+        isCurrent && invalidGuess ? "[animation:var(--animate-shake)]" : ""
       }`}
     >
       {[...Array(GAME.WORD_LENGTH)].map((_, colIndex) => {
-        const isCurrent = rowIndex === currentRow;
         const letter = isCurrent
           ? currentGuess[colIndex] || ""
-          : guesses[rowIndex]?.[colIndex] || "";
+          : guess?.[colIndex] || "";
         const state: LetterState = isCurrent
-          ? letter
-            ? "unused"
-            : "unused"
-          : (evaluations[rowIndex]?.[colIndex] as LetterState) ?? "unused";
+          ? "unused"
+          : (evaluation?.[colIndex] as LetterState) ?? "unused";
 
         return (
           <GameTile
@@ -49,7 +43,9 @@ const GameRow: FC<{ rowIndex: number }> = ({ rowIndex }) => {
       })}
     </div>
   );
-};
+});
+
+GameRow.displayName = "GameRow";
 
 export const GameBoard: FC = () => {
   return (

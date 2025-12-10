@@ -1,5 +1,5 @@
 // components/GameOverModal.tsx
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { getShareText } from "@/utils/game-utils";
 
@@ -30,8 +30,9 @@ export const GameOverModal: FC<GameOverModalProps> = ({
         <div className="mb-6">
           <p className="text-lg mb-2">
             {isWinner
-              ? `You won in ${numGuesses} ${numGuesses === 1 ? "try" : "tries"
-              }!`
+              ? `You won in ${numGuesses} ${
+                  numGuesses === 1 ? "try" : "tries"
+                }!`
               : `Better luck next time!`}
           </p>
           <p className="text-md font-medium">
@@ -54,9 +55,15 @@ export const GameOverModal: FC<GameOverModalProps> = ({
   );
 };
 
-const ShareButton = () => {
-  const { isWinner, guesses, evaluations, mode, solutionId } = useGameStore();
-  const share = async () => {
+const ShareButton: FC = () => {
+  // Use individual selectors for better performance
+  const isWinner = useGameStore((s) => s.isWinner);
+  const guesses = useGameStore((s) => s.guesses);
+  const evaluations = useGameStore((s) => s.evaluations);
+  const mode = useGameStore((s) => s.mode);
+  const solutionId = useGameStore((s) => s.solutionId);
+
+  const share = useCallback(async () => {
     const text = getShareText({
       isWinner,
       guesses,
@@ -68,14 +75,16 @@ const ShareButton = () => {
       await navigator.clipboard.writeText(text);
       alert("Results copied to clipboard!");
     } catch {
-      // Fallback: open share dialog if available
       if (navigator.share) {
         try {
           await navigator.share({ text });
-        } catch { }
+        } catch {
+          // User cancelled or share failed
+        }
       }
     }
-  };
+  }, [isWinner, guesses, evaluations, mode, solutionId]);
+
   return (
     <button
       onClick={share}

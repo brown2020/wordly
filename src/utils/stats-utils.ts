@@ -1,4 +1,4 @@
-import { ScoreData } from "@/hooks/useScores";
+import { ScoreData } from "@/types/types";
 
 export type GameStats = {
   totalGames: number;
@@ -61,4 +61,3 @@ export function calculateStats(scores: ScoreData[]): GameStats {
     guessDistribution,
   };
 }
-

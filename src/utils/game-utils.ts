@@ -22,21 +22,16 @@ export function computeDailyIndex(date: Date): number {
 export function getDailyAnswer(): { answer: string; id: string } {
   const now = new Date();
   const index = computeDailyIndex(now);
-  const ans = normalize(wordList[index].word);
+  const ans = normalize(wordList[index]);
   const id = now.toISOString().slice(0, 10); // YYYY-MM-DD
   return { answer: ans, id };
 }
 
 export function getRandomAnswer(): { answer: string; id: string } {
   const index = Math.floor(Math.random() * wordList.length);
-  const ans = normalize(wordList[index].word);
+  const ans = normalize(wordList[index]);
   const id = `rand-${Date.now()}`;
   return { answer: ans, id };
-}
-
-export function isValidWord(word: string): boolean {
-  const upper = normalize(word);
-  return wordList.some((w) => normalize(w.word) === upper);
 }
 
 export function evaluateGuess(answer: string, guess: string): LetterState[] {
