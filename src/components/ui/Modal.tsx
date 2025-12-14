@@ -40,3 +40,4 @@ export const Modal: FC<ModalProps> = ({
     </div>
   );
 };
+

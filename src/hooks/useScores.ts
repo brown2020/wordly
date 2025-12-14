@@ -21,3 +21,4 @@ export function useScores() {
 
   return { scores, loading };
 }
+

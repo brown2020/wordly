@@ -16,21 +16,28 @@ export const GAME = {
 
 // Beautiful tile styling with proper contrast and visibility
 export const TILE_STYLES = {
-  base: "w-16 h-16 flex items-center justify-center text-2xl font-bold border-2 rounded-xl transition-all duration-300 shadow-tile hover:shadow-tile-hover transform hover:-translate-y-0.5",
-  empty: "border-neutral-300 bg-white text-neutral-400",
-  filled: "border-neutral-400 bg-white text-neutral-800 shadow-medium",
-  current:
-    "border-primary-400 bg-primary-50 text-primary-800 ring-2 ring-primary-200",
-  correct:
-    "bg-emerald-500 text-white border-emerald-500 shadow-medium animate-bounce-gentle",
-  present:
-    "bg-amber-500 text-white border-amber-500 shadow-medium animate-bounce-gentle",
-  absent: "bg-neutral-500 text-white border-neutral-500 shadow-soft",
+  // Wordle-like sizing: adapt to viewport so the board+keyboard fit vertically.
+  // We use min(vw, vh) so short-but-wide windows don't overflow.
+  base: [
+    "flex items-center justify-center font-bold uppercase border-2",
+    "rounded-[0.375rem]",
+    "w-[clamp(2.6rem,min(7.5vw,7vh),3.6rem)] h-[clamp(2.6rem,min(7.5vw,7vh),3.6rem)]",
+    "text-[clamp(1.25rem,min(4.2vw,3.2vh),1.875rem)]",
+    "transition-[transform,background-color,border-color,color] duration-200 select-none cursor-default",
+  ].join(" "),
+  empty: "border-neutral-300/80 bg-white text-neutral-700",
+  filled: "border-neutral-400 bg-white text-neutral-900",
+  current: "border-neutral-500 bg-white text-neutral-900",
+  correct: "bg-emerald-600 text-white border-emerald-600",
+  present: "bg-amber-500 text-white border-amber-500",
+  absent: "bg-neutral-600 text-white border-neutral-600",
 } as const;
 
 // Elegant layout classes with improved spacing
 export const LAYOUT = {
-  container: "w-full max-w-lg mx-auto px-6 py-8",
+  // Full-height layout so we can pin keyboard to bottom.
+  container:
+    "mx-auto flex min-h-dvh w-full max-w-[520px] flex-col px-2 sm:px-4",
   header:
     "flex items-center justify-between py-6 border-b border-neutral-200/60 bg-white/80 backdrop-blur-sm",
   board:

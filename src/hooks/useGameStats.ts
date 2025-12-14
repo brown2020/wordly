@@ -27,3 +27,4 @@ export function useGameStats() {
     }
   }, [isGameOver, isWinner, guesses.length, score, answer]);
 }
+

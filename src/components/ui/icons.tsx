@@ -52,3 +52,4 @@ export const CloseIcon: FC<IconProps> = ({ className = "h-6 w-6" }) => (
     />
   </svg>
 );
+

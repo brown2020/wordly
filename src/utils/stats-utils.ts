@@ -61,3 +61,4 @@ export function calculateStats(scores: ScoreData[]): GameStats {
     guessDistribution,
   };
 }
+

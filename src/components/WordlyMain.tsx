@@ -24,28 +24,26 @@ export default function WordlyMain() {
 
   return (
     <div className={LAYOUT.container}>
-      {/* Elegant header card */}
-      <div className="card mb-8">
+      {/* Wordle-like frame: header top, board centered, keyboard bottom */}
+      <div className="sticky top-0 z-20 -mx-2 sm:-mx-4 border-b border-neutral-200/70 bg-white/80 px-2 backdrop-blur-sm sm:px-4">
         <GameHeader />
       </div>
 
-      {/* Main game area */}
-      <main className="flex-1 flex flex-col items-center justify-center">
-        {/* Game board with beautiful card styling */}
-        <div className="card-elevated p-8 mb-8">
+      <main className="flex flex-1 flex-col items-center justify-center py-3">
+        <div className="flex flex-col items-center gap-3">
           <GameBoard />
-
-          {/* Attempts counter with elegant styling */}
           <AttemptsCounter attempts={guesses.length} maxAttempts={6} />
         </div>
-
-        {/* Action buttons with beautiful styling */}
-        <GameControls onShowStats={() => setShowStats(true)} />
-
-        <div className="mt-6 w-full max-w-md">
-          <OnscreenKeyboard />
-        </div>
       </main>
+
+      <footer className="pt-2 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="w-full">
+          <OnscreenKeyboard />
+          <div className="mt-3">
+            <GameControls onShowStats={() => setShowStats(true)} />
+          </div>
+        </div>
+      </footer>
 
       <GameOverModal
         isWinner={isWinner}
