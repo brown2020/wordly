@@ -18,7 +18,7 @@ const GameRow: FC<{ rowIndex: number }> = memo(({ rowIndex }) => {
   return (
     <div
       className={`flex gap-1.5 ${
-        isCurrent && invalidGuess ? "[animation:var(--animate-shake)]" : ""
+        isCurrent && invalidGuess ? "animate-shake" : ""
       }`}
     >
       {[...Array(GAME.WORD_LENGTH)].map((_, colIndex) => {
@@ -49,7 +49,7 @@ GameRow.displayName = "GameRow";
 
 export const GameBoard: FC = () => {
   return (
-    <div className="flex flex-col gap-1.5 p-4">
+    <div className="flex flex-col gap-1.5">
       {[...Array(GAME.MAX_ATTEMPTS)].map((_, rowIndex) => (
         <GameRow key={rowIndex} rowIndex={rowIndex} />
       ))}

@@ -18,48 +18,50 @@ const STATE_STYLES: Record<string, string> = {
   unused: TILE_STYLES.empty,
 } as const;
 
-export const GameTile: FC<GameTileProps> = memo(({
-  letter,
-  state,
-  isRevealing,
-  position,
-  isCurrentRow,
-  isInvalidGuess = false,
-}) => {
-  const getStateClasses = (): string => {
-    if (isInvalidGuess) return "border-red-400 bg-red-50 text-red-700 animate-shake";
-    if (!letter) return TILE_STYLES.empty;
-    if (isCurrentRow && letter) return TILE_STYLES.current;
-    if (letter && state === "unused") return TILE_STYLES.filled; // Filled but not yet evaluated
-    return STATE_STYLES[state] ?? TILE_STYLES.empty;
-  };
+export const GameTile: FC<GameTileProps> = memo(
+  ({
+    letter,
+    state,
+    isRevealing,
+    position,
+    isCurrentRow,
+    isInvalidGuess = false,
+  }) => {
+    const getStateClasses = (): string => {
+      if (isInvalidGuess)
+        return "border-red-400 bg-red-50 text-red-700 animate-shake";
+      if (!letter) return TILE_STYLES.empty;
+      if (isCurrentRow && letter) return TILE_STYLES.current;
+      if (letter && state === "unused") return TILE_STYLES.filled; // Filled but not yet evaluated
+      return STATE_STYLES[state] ?? TILE_STYLES.empty;
+    };
 
-  const getAnimationClass = (): string => {
-    if (isRevealing) return "tile-flip";
-    if (letter && isCurrentRow) return "animate-bounce-gentle";
-    return "";
-  };
+    const getAnimationClass = (): string => {
+      if (isRevealing) return "tile-flip";
+      return "";
+    };
 
-  const classes = [
-    TILE_STYLES.base, 
-    getStateClasses(), 
-    getAnimationClass(),
-    "select-none cursor-default"
-  ]
-    .filter(Boolean)
-    .join(" ");
+    const classes = [
+      TILE_STYLES.base,
+      getStateClasses(),
+      getAnimationClass(),
+      "select-none cursor-default",
+    ]
+      .filter(Boolean)
+      .join(" ");
 
-  return (
-    <div
-      className={classes}
-      style={{
-        transitionDelay: isRevealing ? `${position * 150}ms` : "0ms",
-        animationDelay: isRevealing ? `${position * 150}ms` : "0ms",
-      }}
-    >
-      {letter}
-    </div>
-  );
-});
+    return (
+      <div
+        className={classes}
+        style={{
+          transitionDelay: isRevealing ? `${position * 150}ms` : "0ms",
+          animationDelay: isRevealing ? `${position * 150}ms` : "0ms",
+        }}
+      >
+        {letter}
+      </div>
+    );
+  }
+);
 
 GameTile.displayName = "GameTile";

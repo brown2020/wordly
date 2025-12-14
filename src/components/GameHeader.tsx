@@ -4,10 +4,16 @@ import { StarIcon } from "./ui/icons";
 export const GameHeader = () => {
   const score = useGameStore((s: GameStoreState) => s.score);
   return (
-    <header className="flex justify-between items-center p-6">
-      <Logo />
-      <div className="flex items-center gap-3">
+    <header className="grid h-14 grid-cols-3 items-center">
+      <div className="flex items-center justify-start">
         <ModeToggle />
+      </div>
+
+      <div className="flex items-center justify-center">
+        <Logo />
+      </div>
+
+      <div className="flex items-center justify-end">
         <ScoreDisplay score={score} />
       </div>
     </header>
@@ -15,21 +21,15 @@ export const GameHeader = () => {
 };
 
 const Logo = () => (
-  <div className="flex items-center space-x-2">
-    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-purple rounded-lg flex items-center justify-center">
-      <span className="text-white font-bold text-lg">W</span>
-    </div>
-    <h1 className="text-3xl font-bold gradient-text">Wordly</h1>
-  </div>
+  <h1 className="select-none text-[clamp(1.125rem,2.2vw,1.5rem)] font-semibold tracking-[0.25em] text-neutral-900">
+    WORDLY
+  </h1>
 );
 
 const ScoreDisplay = ({ score }: { score: number }) => (
-  <div className="flex items-center space-x-2 bg-gradient-to-r from-primary-50 to-accent-purple/10 px-4 py-2 rounded-full border border-primary-200/50">
-    <StarIcon className="w-4 h-4 text-primary-600" />
-    <div className="text-sm">
-      <span className="text-neutral-600 font-medium">Score:</span>
-      <span className="ml-1 font-bold text-primary-700">{score}</span>
-    </div>
+  <div className="flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700">
+    <StarIcon className="h-4 w-4 text-neutral-700" />
+    <span className="tabular-nums">{score}</span>
   </div>
 );
 
@@ -40,7 +40,7 @@ const ModeToggle = () => {
   return (
     <button
       onClick={() => startNewGame(nextMode)}
-      className="px-3 py-2 text-sm bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50"
+      className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50 active:bg-neutral-100"
       title={`Switch to ${nextMode} mode`}
     >
       {mode === "daily" ? "Daily" : "Random"}

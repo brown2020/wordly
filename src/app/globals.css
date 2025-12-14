@@ -23,12 +23,13 @@ html {
 }
 
 body {
-  background: linear-gradient(135deg, #fafafa 0%, #ffffff 50%, #f0f9ff 100%);
+  /* Wordle-like neutral canvas: reduce decorative gradient so the board is the hero */
+  background: #f8fafc;
   color: #262626;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  background-attachment: fixed;
+  background-attachment: scroll;
 }
 
 /* Beautiful focus styles */
