@@ -1,8 +1,8 @@
-import { useGameStore, GameStoreState } from "@/stores/game-store";
+import { useGameStore } from "@/stores/game-store";
 import { StarIcon } from "./ui/icons";
 
 export const GameHeader = () => {
-  const score = useGameStore((s: GameStoreState) => s.score);
+  const score = useGameStore((s) => s.score);
   return (
     <header className="grid h-14 grid-cols-3 items-center">
       <div className="flex items-center justify-start">
@@ -34,8 +34,8 @@ const ScoreDisplay = ({ score }: { score: number }) => (
 );
 
 const ModeToggle = () => {
-  const mode = useGameStore((s: GameStoreState) => s.mode);
-  const startNewGame = useGameStore((s: GameStoreState) => s.startNewGame);
+  const mode = useGameStore((s) => s.mode);
+  const startNewGame = useGameStore((s) => s.startNewGame);
   const nextMode = mode === "daily" ? "random" : "daily";
   return (
     <button

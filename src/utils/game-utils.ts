@@ -1,4 +1,5 @@
 import { GameStoreState } from "@/stores/game-store";
+import { GAME } from "@/constants/constants";
 import { wordList } from "@/constants/wordlist";
 import { LetterState, KeyboardState } from "@/types/types";
 
@@ -101,8 +102,8 @@ export function getShareText(
   const { isWinner, guesses, evaluations, mode, solutionId } = state;
   const header =
     mode === "daily"
-      ? `Wordly ${solutionId} ${isWinner ? guesses.length : "X"}/6`
-      : `Wordly ${isWinner ? guesses.length : "X"}/6`;
+      ? `Wordly ${solutionId} ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}`
+      : `Wordly ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}`;
   const rows = evaluations
     .map((evalRow) =>
       evalRow

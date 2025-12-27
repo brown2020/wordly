@@ -1,6 +1,7 @@
 "use client";
 
 import { useGameStore } from "@/stores/game-store";
+import type { LetterState } from "@/types/types";
 
 const ROWS = [
   "QWERTYUIOP".split(""),
@@ -8,28 +9,34 @@ const ROWS = [
   ["Enter", ..."ZXCVBNM".split(""), "Back"],
 ];
 
-const getKeyClasses = (k: string, state?: string) => {
+type KeyState = Exclude<LetterState, "unused">;
+
+const KEY_BASE_CLASSES = [
+  "select-none",
+  "inline-flex items-center justify-center",
+  "rounded-md",
+  "font-semibold uppercase",
+  "transition-colors",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/60",
+  "active:translate-y-[1px]",
+  "h-[clamp(2.6rem,6vh,3.25rem)]",
+  "text-[clamp(0.75rem,1.8vh,0.95rem)]",
+  "px-0",
+].join(" ");
+
+const KEY_STATE_CLASSES: Record<KeyState, string> = {
+  correct: "bg-emerald-600 text-white",
+  present: "bg-amber-500 text-white",
+  absent: "bg-neutral-600 text-white",
+};
+
+const getKeyClasses = (k: string, state?: KeyState) => {
   const base = [
-    "select-none",
-    "inline-flex items-center justify-center",
-    "rounded-md",
-    "font-semibold uppercase",
-    "transition-colors",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400/60",
-    "active:translate-y-[1px]",
-    "h-[clamp(2.6rem,6vh,3.25rem)]",
-    "text-[clamp(0.75rem,1.8vh,0.95rem)]",
-    "px-0",
+    KEY_BASE_CLASSES,
   ].join(" ");
 
-  const stateMap: Record<string, string> = {
-    correct: "bg-emerald-600 text-white",
-    present: "bg-amber-500 text-white",
-    absent: "bg-neutral-600 text-white",
-  };
-
   const chrome = state
-    ? stateMap[state] ?? "bg-neutral-300 text-neutral-900"
+    ? KEY_STATE_CLASSES[state] ?? "bg-neutral-300 text-neutral-900"
     : "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-400";
 
   const isWide = k === "Enter" || k === "Back";

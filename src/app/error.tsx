@@ -16,12 +16,12 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 p-4">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md text-center">
         <h2 className="text-2xl font-bold text-red-600 mb-4">
           Something went wrong!
         </h2>
-        <p className="text-gray-600 mb-6">
+        <p className="mb-6 text-neutral-600">
           We&apos;re sorry, but there was an error loading the game. Please try
           again.
         </p>

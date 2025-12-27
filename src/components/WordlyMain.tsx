@@ -5,7 +5,7 @@ import { GameBoard } from "@/components/GameBoard";
 import { GameOverModal } from "@/components/GameOverModal";
 import { GameHeader } from "@/components/GameHeader";
 import StatsModal from "@/components/StatsModal";
-import { LAYOUT } from "@/constants/constants";
+import { GAME, LAYOUT } from "@/constants/constants";
 import dynamic from "next/dynamic";
 import { useGameController } from "@/hooks/useGameController";
 import { AttemptsCounter } from "@/components/AttemptsCounter";
@@ -32,7 +32,10 @@ export default function WordlyMain() {
       <main className="flex flex-1 flex-col items-center justify-center py-3">
         <div className="flex flex-col items-center gap-3">
           <GameBoard />
-          <AttemptsCounter attempts={guesses.length} maxAttempts={6} />
+          <AttemptsCounter
+            attempts={guesses.length}
+            maxAttempts={GAME.MAX_ATTEMPTS}
+          />
         </div>
       </main>
 

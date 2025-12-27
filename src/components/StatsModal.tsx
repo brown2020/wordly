@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useScores } from "@/hooks/useScores";
 import { calculateStats } from "@/utils/stats-utils";
 import { Modal } from "./ui/Modal";
+import { GAME } from "@/constants/constants";
 
 interface StatsModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} title="Statistics">
       {loading ? (
         <div className="flex justify-center">
-          <div className="animate-pulse h-40 w-full bg-gray-200 rounded" />
+          <div className="h-40 w-full animate-pulse rounded bg-neutral-200" />
         </div>
       ) : stats ? (
         <>
@@ -43,15 +44,16 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
 
           <h3 className="text-lg font-medium mb-3">Guess Distribution</h3>
           <div className="space-y-2">
-            {[1, 2, 3, 4, 5, 6].map((guessNumber) => {
+            {Array.from({ length: GAME.MAX_ATTEMPTS }, (_, i) => i + 1).map(
+              (guessNumber) => {
               const count = stats.guessDistribution[guessNumber] || 0;
               const percentage =
                 maxDistribution > 0 ? (count / maxDistribution) * 100 : 0;
 
               return (
                 <div key={guessNumber} className="flex items-center space-x-2">
-                  <div className="w-4 text-gray-600">{guessNumber}</div>
-                  <div className="flex-1 h-6 bg-gray-200 rounded-sm overflow-hidden">
+                  <div className="w-4 text-neutral-600">{guessNumber}</div>
+                  <div className="flex-1 h-6 overflow-hidden rounded-sm bg-neutral-200">
                     <div
                       className="h-full bg-green-600 flex items-center justify-end px-2"
                       style={{ width: `${Math.max(5, percentage)}%` }}
@@ -69,7 +71,7 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
           </div>
         </>
       ) : (
-        <p className="text-center text-gray-500">
+        <p className="text-center text-neutral-500">
           No statistics available yet. Play some games!
         </p>
       )}
@@ -81,7 +83,7 @@ function StatItem({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="flex flex-col items-center">
       <span className="text-2xl font-bold">{value}</span>
-      <span className="text-xs text-gray-500">{label}</span>
+      <span className="text-xs text-neutral-500">{label}</span>
     </div>
   );
 }

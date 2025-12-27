@@ -8,10 +8,10 @@ export function useScores() {
 
   useEffect(() => {
     try {
-      const savedScores = localStorage.getItem(STORAGE_KEYS.SCORES);
-      if (savedScores) {
-        setScores(JSON.parse(savedScores));
-      }
+      const raw = localStorage.getItem(STORAGE_KEYS.SCORES);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      setScores(Array.isArray(parsed) ? parsed : []);
     } catch (error) {
       console.error("Error loading scores:", error);
     } finally {

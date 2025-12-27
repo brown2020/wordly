@@ -4,23 +4,33 @@ import { GAME } from "@/constants/constants";
 import { GameTile } from "./GameTile";
 import { useGameStore } from "@/stores/game-store";
 import { LetterState } from "@/types/types";
+import { useShallow } from "zustand/shallow";
 
 const GameRow: FC<{ rowIndex: number }> = memo(({ rowIndex }) => {
-  const currentRow = useGameStore((s) => s.currentRow);
-  const invalidGuess = useGameStore((s) => s.invalidGuess);
-  const currentGuess = useGameStore((s) => s.currentGuess);
-  const guess = useGameStore((s) => s.guesses[rowIndex]);
-  const evaluation = useGameStore((s) => s.evaluations[rowIndex]);
-  const isRevealing = useGameStore((s) => s.isRevealing);
+  const {
+    currentRow,
+    invalidGuess,
+    currentGuess,
+    guess,
+    evaluation,
+    isRevealing,
+  } = useGameStore(
+    useShallow((s) => ({
+      currentRow: s.currentRow,
+      invalidGuess: s.invalidGuess,
+      currentGuess: s.currentGuess,
+      guess: s.guesses[rowIndex],
+      evaluation: s.evaluations[rowIndex],
+      isRevealing: s.isRevealing,
+    }))
+  );
 
   const isCurrent = rowIndex === currentRow;
+  const isInvalidRow = isCurrent && invalidGuess;
+  const isRevealingRow = isRevealing && rowIndex === currentRow - 1;
 
   return (
-    <div
-      className={`flex gap-1.5 ${
-        isCurrent && invalidGuess ? "animate-shake" : ""
-      }`}
-    >
+    <div className={`flex gap-1.5 ${isInvalidRow ? "animate-shake" : ""}`}>
       {[...Array(GAME.WORD_LENGTH)].map((_, colIndex) => {
         const letter = isCurrent
           ? currentGuess[colIndex] || ""
@@ -34,10 +44,10 @@ const GameRow: FC<{ rowIndex: number }> = memo(({ rowIndex }) => {
             key={`${rowIndex}-${colIndex}`}
             letter={letter}
             state={state}
-            isRevealing={isRevealing && rowIndex === currentRow - 1}
+            isRevealing={isRevealingRow}
             position={colIndex}
             isCurrentRow={isCurrent}
-            isInvalidGuess={isCurrent && invalidGuess}
+            isInvalidGuess={isInvalidRow}
           />
         );
       })}

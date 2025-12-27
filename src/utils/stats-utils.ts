@@ -1,4 +1,5 @@
 import { ScoreData } from "@/types/types";
+import { GAME } from "@/constants/constants";
 
 export type GameStats = {
   totalGames: number;
@@ -12,15 +13,21 @@ export type GameStats = {
 
 export function calculateStats(scores: ScoreData[]): GameStats {
   const totalGames: number = scores.length;
-  const wins: number = scores.filter((s) => s.attempts > 0).length;
+  const isWin = (s: ScoreData) =>
+    s.isWin ?? (s.attempts >= 1 && s.attempts < GAME.MAX_ATTEMPTS);
+
+  const wins: number = scores.filter(isWin).length;
 
   // Streaks: compute by consecutive days with wins
   const byDay = new Map<string, boolean>();
   for (const s of scores) {
     const day = new Date(s.date).toISOString().slice(0, 10);
-    byDay.set(day, true);
+    byDay.set(day, (byDay.get(day) ?? false) || isWin(s));
   }
-  const days = [...byDay.keys()].sort();
+  const days = [...byDay.entries()]
+    .filter(([, won]) => won)
+    .map(([day]) => day)
+    .sort();
   let maxStreak: number = 0;
   let currentStreak: number = 0;
   let prev: string | null = null;
@@ -41,16 +48,12 @@ export function calculateStats(scores: ScoreData[]): GameStats {
     maxStreak = Math.max(maxStreak, currentStreak);
   }
 
-  const guessDistribution: Record<number, number> = {
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-  };
+  const guessDistribution: Record<number, number> = {};
+  for (let i = 1; i <= GAME.MAX_ATTEMPTS; i++) guessDistribution[i] = 0;
   for (const s of scores) {
-    if (s.attempts >= 1 && s.attempts <= 6) guessDistribution[s.attempts]++;
+    if (isWin(s) && s.attempts >= 1 && s.attempts <= GAME.MAX_ATTEMPTS) {
+      guessDistribution[s.attempts]++;
+    }
   }
 
   return {

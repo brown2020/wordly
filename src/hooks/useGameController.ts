@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useGameStats } from "./useGameStats";
+import { useShallow } from "zustand/shallow";
 
 export function useGameController() {
-  const { guesses, isGameOver, isWinner, answer, handleKey, startNewGame } =
-    useGameStore();
+  const { guesses, isGameOver, isWinner, answer, startNewGame } = useGameStore(
+    useShallow((s) => ({
+      guesses: s.guesses,
+      isGameOver: s.isGameOver,
+      isWinner: s.isWinner,
+      answer: s.answer,
+      startNewGame: s.startNewGame,
+    }))
+  );
 
   const [showModal, setShowModal] = useState(false);
 
@@ -14,15 +22,14 @@ export function useGameController() {
   // Handle keyboard input
   useEffect(() => {
     // Ensure a game is initialized (random by default)
-    if (!answer) {
-      startNewGame("random");
+    if (!useGameStore.getState().answer) {
+      useGameStore.getState().startNewGame("random");
     }
-    const handleKeyDown = (event: KeyboardEvent) => {
-      handleKey(event.key);
-    };
+    const handleKeyDown = (event: KeyboardEvent) =>
+      useGameStore.getState().handleKey(event.key);
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKey, answer, startNewGame]);
+  }, []);
 
   // Handle game over modal
   useEffect(() => {

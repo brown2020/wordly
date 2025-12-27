@@ -12,4 +12,9 @@ export interface ScoreData {
   date: string;
   attempts: number;
   word: string;
+  /**
+   * Whether the game was won. Older stored score entries may omit this field.
+   * When missing, stats fall back to a best-effort heuristic.
+   */
+  isWin?: boolean;
 }

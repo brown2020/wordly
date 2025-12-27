@@ -9,7 +9,7 @@ export default function Loading() {
             .map((_, i) => (
               <div
                 key={i}
-                className="w-14 h-14 border-2 border-gray-300 flex items-center justify-center rounded"
+                className="flex h-14 w-14 items-center justify-center rounded border-2 border-neutral-300"
               />
             ))}
         </div>

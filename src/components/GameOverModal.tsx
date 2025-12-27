@@ -2,6 +2,7 @@
 import { FC, useCallback } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { getShareText } from "@/utils/game-utils";
+import { useShallow } from "zustand/shallow";
 
 interface GameOverModalProps {
   isWinner: boolean;
@@ -56,12 +57,15 @@ export const GameOverModal: FC<GameOverModalProps> = ({
 };
 
 const ShareButton: FC = () => {
-  // Use individual selectors for better performance
-  const isWinner = useGameStore((s) => s.isWinner);
-  const guesses = useGameStore((s) => s.guesses);
-  const evaluations = useGameStore((s) => s.evaluations);
-  const mode = useGameStore((s) => s.mode);
-  const solutionId = useGameStore((s) => s.solutionId);
+  const { isWinner, guesses, evaluations, mode, solutionId } = useGameStore(
+    useShallow((s) => ({
+      isWinner: s.isWinner,
+      guesses: s.guesses,
+      evaluations: s.evaluations,
+      mode: s.mode,
+      solutionId: s.solutionId,
+    }))
+  );
 
   const share = useCallback(async () => {
     const text = getShareText({
