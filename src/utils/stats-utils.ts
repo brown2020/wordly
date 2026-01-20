@@ -14,7 +14,7 @@ export type GameStats = {
 export function calculateStats(scores: ScoreData[]): GameStats {
   const totalGames: number = scores.length;
   const isWin = (s: ScoreData) =>
-    s.isWin ?? (s.attempts >= 1 && s.attempts < GAME.MAX_ATTEMPTS);
+    s.isWin ?? (s.attempts >= 1 && s.attempts <= GAME.MAX_ATTEMPTS);
 
   const wins: number = scores.filter(isWin).length;
 
@@ -46,6 +46,36 @@ export function calculateStats(scores: ScoreData[]): GameStats {
     }
     prev = d;
     maxStreak = Math.max(maxStreak, currentStreak);
+  }
+
+  // Current streak must end on today or yesterday
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const yesterdayStr = new Date(today.getTime() - 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+  const anchor =
+    byDay.get(todayStr) ? todayStr : byDay.get(yesterdayStr) ? yesterdayStr : null;
+  if (anchor) {
+    let streak = 1;
+    let cursor = anchor;
+    while (true) {
+      const prevDate = new Date(cursor);
+      const prevStr = new Date(
+        prevDate.getTime() - 24 * 60 * 60 * 1000
+      )
+        .toISOString()
+        .slice(0, 10);
+      if (byDay.get(prevStr)) {
+        streak += 1;
+        cursor = prevStr;
+      } else {
+        break;
+      }
+    }
+    currentStreak = streak;
+  } else {
+    currentStreak = 0;
   }
 
   const guessDistribution: Record<number, number> = {};

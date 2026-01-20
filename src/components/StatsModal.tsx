@@ -49,6 +49,7 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
               const count = stats.guessDistribution[guessNumber] || 0;
               const percentage =
                 maxDistribution > 0 ? (count / maxDistribution) * 100 : 0;
+              const barWidth = count > 0 ? Math.max(5, percentage) : 0;
 
               return (
                 <div key={guessNumber} className="flex items-center space-x-2">
@@ -56,7 +57,7 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
                   <div className="flex-1 h-6 overflow-hidden rounded-sm bg-neutral-200">
                     <div
                       className="h-full bg-green-600 flex items-center justify-end px-2"
-                      style={{ width: `${Math.max(5, percentage)}%` }}
+                      style={{ width: `${barWidth}%` }}
                     >
                       {count > 0 && (
                         <span className="text-white text-xs font-medium">

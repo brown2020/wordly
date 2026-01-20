@@ -21,9 +21,9 @@ export function useGameController() {
 
   // Handle keyboard input
   useEffect(() => {
-    // Ensure a game is initialized (random by default)
+    // Ensure a game is initialized (use persisted mode when available)
     if (!useGameStore.getState().answer) {
-      useGameStore.getState().startNewGame("random");
+      useGameStore.getState().startNewGame();
     }
     const handleKeyDown = (event: KeyboardEvent) =>
       useGameStore.getState().handleKey(event.key);
