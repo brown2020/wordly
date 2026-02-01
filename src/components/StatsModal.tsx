@@ -31,7 +31,7 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} title="Statistics">
       {loading ? (
         <div className="flex justify-center">
-          <div className="h-40 w-full animate-pulse rounded bg-neutral-200" />
+          <div className="h-40 w-full animate-pulse rounded bg-neutral-200 dark:bg-neutral-700" />
         </div>
       ) : stats ? (
         <>
@@ -42,37 +42,44 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
             <StatItem value={stats.maxStreak} label="Max Streak" />
           </div>
 
-          <h3 className="text-lg font-medium mb-3">Guess Distribution</h3>
+          <h3 className="text-lg font-medium mb-3 text-neutral-900 dark:text-white">
+            Guess Distribution
+          </h3>
           <div className="space-y-2">
             {Array.from({ length: GAME.MAX_ATTEMPTS }, (_, i) => i + 1).map(
               (guessNumber) => {
-              const count = stats.guessDistribution[guessNumber] || 0;
-              const percentage =
-                maxDistribution > 0 ? (count / maxDistribution) * 100 : 0;
-              const barWidth = count > 0 ? Math.max(5, percentage) : 0;
+                const count = stats.guessDistribution[guessNumber] || 0;
+                const percentage =
+                  maxDistribution > 0 ? (count / maxDistribution) * 100 : 0;
+                const barWidth = count > 0 ? Math.max(7, percentage) : 7;
 
-              return (
-                <div key={guessNumber} className="flex items-center space-x-2">
-                  <div className="w-4 text-neutral-600">{guessNumber}</div>
-                  <div className="flex-1 h-6 overflow-hidden rounded-sm bg-neutral-200">
-                    <div
-                      className="h-full bg-green-600 flex items-center justify-end px-2"
-                      style={{ width: `${barWidth}%` }}
-                    >
-                      {count > 0 && (
-                        <span className="text-white text-xs font-medium">
+                return (
+                  <div key={guessNumber} className="flex items-center space-x-2">
+                    <div className="w-4 text-neutral-600 dark:text-neutral-400">
+                      {guessNumber}
+                    </div>
+                    <div className="flex-1 h-5 overflow-hidden rounded-sm">
+                      <div
+                        className={`h-full flex items-center justify-end px-2 ${
+                          count > 0
+                            ? "bg-green-600"
+                            : "bg-neutral-300 dark:bg-neutral-600"
+                        }`}
+                        style={{ width: `${barWidth}%` }}
+                      >
+                        <span className="text-white text-xs font-bold">
                           {count}
                         </span>
-                      )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              }
+            )}
           </div>
         </>
       ) : (
-        <p className="text-center text-neutral-500">
+        <p className="text-center text-neutral-500 dark:text-neutral-400">
           No statistics available yet. Play some games!
         </p>
       )}
@@ -83,8 +90,12 @@ export default function StatsModal({ isOpen, onClose }: StatsModalProps) {
 function StatItem({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <span className="text-2xl font-bold">{value}</span>
-      <span className="text-xs text-neutral-500">{label}</span>
+      <span className="text-2xl font-bold text-neutral-900 dark:text-white">
+        {value}
+      </span>
+      <span className="text-xs text-neutral-500 dark:text-neutral-400">
+        {label}
+      </span>
     </div>
   );
 }

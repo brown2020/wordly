@@ -10,9 +10,13 @@ import {
   getRandomAnswer,
   evaluateGuess,
   mergeKeyboardState,
+  isValidWord,
+  validateHardMode,
 } from "@/utils/game-utils";
 
 type GameMode = "daily" | "random";
+
+export type InvalidReason = "not_word" | "hard_mode" | "too_short" | null;
 
 export interface GameStoreState {
   // Core game state
@@ -25,19 +29,21 @@ export interface GameStoreState {
   isGameOver: boolean;
   isWinner: boolean;
   invalidGuess: boolean;
+  invalidReason: InvalidReason;
+  invalidMessage: string;
 
   // Meta
   mode: GameMode;
   solutionId: string; // YYYY-MM-DD for daily or random seed id
   keyboard: KeyboardState; // letter -> best-known state
-  score: number; // simple cumulative score like existing app
+  gameInProgress: boolean; // whether a game has been started (for hard mode lock)
 
   // Actions
   startNewGame: (mode?: GameMode) => void;
-  handleKey: (key: string) => void;
+  handleKey: (key: string, hardMode?: boolean) => void;
   addLetter: (letter: string) => void;
   removeLetter: () => void;
-  submitGuess: () => void;
+  submitGuess: (hardMode?: boolean) => void;
   resetInvalid: () => void;
 }
 
@@ -53,13 +59,15 @@ export const useGameStore = create<GameStoreState>()(
       isGameOver: false,
       isWinner: false,
       invalidGuess: false,
-      mode: "random",
+      invalidReason: null,
+      invalidMessage: "",
+      mode: "daily",
       solutionId: "",
       keyboard: {},
-      score: 0,
+      gameInProgress: false,
 
       startNewGame: (mode) => {
-        const desiredMode = mode ?? get().mode ?? "random";
+        const desiredMode = mode ?? get().mode ?? "daily";
         const { answer, id } =
           desiredMode === "daily" ? getDailyAnswer() : getRandomAnswer();
         set({
@@ -74,7 +82,10 @@ export const useGameStore = create<GameStoreState>()(
           isGameOver: false,
           isWinner: false,
           invalidGuess: false,
+          invalidReason: null,
+          invalidMessage: "",
           keyboard: {},
+          gameInProgress: false,
         });
       },
 
@@ -89,6 +100,8 @@ export const useGameStore = create<GameStoreState>()(
             GAME.WORD_LENGTH
           ),
           invalidGuess: false,
+          invalidReason: null,
+          invalidMessage: "",
         });
       },
 
@@ -96,28 +109,59 @@ export const useGameStore = create<GameStoreState>()(
         const { currentGuess, isGameOver } = get();
         if (isGameOver) return;
         if (currentGuess.length === 0) return;
-        set({ currentGuess: currentGuess.slice(0, -1), invalidGuess: false });
+        set({
+          currentGuess: currentGuess.slice(0, -1),
+          invalidGuess: false,
+          invalidReason: null,
+          invalidMessage: "",
+        });
       },
 
-      submitGuess: () => {
-        const { currentGuess, answer, guesses, isGameOver } = get();
+      submitGuess: (hardMode = false) => {
+        const { currentGuess, answer, guesses, evaluations, isGameOver } = get();
         if (isGameOver) return;
+
+        // Check word length
         if (currentGuess.length !== GAME.WORD_LENGTH) {
-          set({ invalidGuess: true });
+          set({
+            invalidGuess: true,
+            invalidReason: "too_short",
+            invalidMessage: "Not enough letters",
+          });
           return;
         }
-        // Allow any 5-letter guess to avoid overly strict dictionary blocks
 
         const guess = normalize(currentGuess);
+
+        // Validate against dictionary
+        if (!isValidWord(guess)) {
+          set({
+            invalidGuess: true,
+            invalidReason: "not_word",
+            invalidMessage: "Not in word list",
+          });
+          return;
+        }
+
+        // Validate hard mode rules
+        if (hardMode && guesses.length > 0) {
+          const hardModeError = validateHardMode(guess, guesses, evaluations);
+          if (hardModeError) {
+            set({
+              invalidGuess: true,
+              invalidReason: "hard_mode",
+              invalidMessage: hardModeError,
+            });
+            return;
+          }
+        }
+
         const evals = evaluateGuess(answer, guess);
         const nextGuesses = [...guesses, guess];
-        const nextEvaluations = [...get().evaluations, evals];
+        const nextEvaluations = [...evaluations, evals];
         const isWinner = evals.every((s) => s === "correct");
         const isLast = nextGuesses.length >= GAME.MAX_ATTEMPTS;
         const gameOver = isWinner || isLast;
-        const addedScore = isWinner
-          ? GAME.POINTS_PER_ATTEMPT * (GAME.MAX_ATTEMPTS - nextGuesses.length)
-          : 0;
 
         set({
           guesses: nextGuesses,
@@ -128,8 +172,10 @@ export const useGameStore = create<GameStoreState>()(
           isWinner,
           isGameOver: gameOver,
           invalidGuess: false,
+          invalidReason: null,
+          invalidMessage: "",
           keyboard: mergeKeyboardState(get().keyboard, guess, evals),
-          score: get().score + addedScore,
+          gameInProgress: true,
         });
 
         // End reveal after animation duration
@@ -142,9 +188,9 @@ export const useGameStore = create<GameStoreState>()(
         }, revealMs);
       },
 
-      handleKey: (key) => {
+      handleKey: (key, hardMode = false) => {
         if (key === "Enter") {
-          get().submitGuess();
+          get().submitGuess(hardMode);
           return;
         }
         if (key === "Backspace" || key === "Delete") {
@@ -156,14 +202,14 @@ export const useGameStore = create<GameStoreState>()(
         }
       },
 
-      resetInvalid: () => set({ invalidGuess: false }),
+      resetInvalid: () =>
+        set({ invalidGuess: false, invalidReason: null, invalidMessage: "" }),
     }),
     {
-      name: "wordly-game", // persist basic game meta and score, not guesses
+      name: "wordly-game",
       partialize: (state) => ({
         mode: state.mode,
         solutionId: state.solutionId,
-        score: state.score,
       }),
     }
   )

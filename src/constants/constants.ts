@@ -20,17 +20,25 @@ export const TILE_STYLES = {
   // We use min(vw, vh) so short-but-wide windows don't overflow.
   base: [
     "flex items-center justify-center font-bold uppercase border-2",
-    "rounded-[0.375rem]",
+    "rounded-[0.25rem]",
     "w-[clamp(2.6rem,min(7.5vw,7vh),3.6rem)] h-[clamp(2.6rem,min(7.5vw,7vh),3.6rem)]",
     "text-[clamp(1.25rem,min(4.2vw,3.2vh),1.875rem)]",
     "transition-[transform,background-color,border-color,color] duration-200 select-none cursor-default",
   ].join(" "),
-  empty: "border-neutral-300/80 bg-white text-neutral-700",
-  filled: "border-neutral-400 bg-white text-neutral-900",
-  current: "border-neutral-500 bg-white text-neutral-900",
-  correct: "bg-emerald-600 text-white border-emerald-600",
-  present: "bg-amber-500 text-white border-amber-500",
-  absent: "bg-neutral-600 text-white border-neutral-600",
+  empty: "border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-white",
+  filled: "border-neutral-500 dark:border-neutral-400 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white",
+  current: "border-neutral-500 dark:border-neutral-400 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white",
+  // Standard colors
+  correct: "bg-green-600 text-white border-green-600",
+  present: "bg-yellow-500 text-white border-yellow-500",
+  absent: "bg-neutral-500 dark:bg-neutral-700 text-white border-neutral-500 dark:border-neutral-700",
+} as const;
+
+// High contrast tile styles
+export const TILE_STYLES_HC = {
+  correct: "bg-orange-500 text-white border-orange-500",
+  present: "bg-cyan-500 text-white border-cyan-500",
+  absent: "bg-neutral-500 dark:bg-neutral-700 text-white border-neutral-500 dark:border-neutral-700",
 } as const;
 
 // Elegant layout classes with improved spacing
