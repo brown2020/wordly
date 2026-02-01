@@ -21,7 +21,7 @@ const OnscreenKeyboard = dynamic(
 );
 
 export default function WordlyMain() {
-  const { showModal, handlePlayAgain, guesses, isWinner, answer } =
+  const { showModal, handlePlayAgain, closeModal, guesses, isWinner, answer } =
     useGameController();
 
   const [showStats, setShowStats] = useState(false);
@@ -90,6 +90,7 @@ export default function WordlyMain() {
         wordToGuess={answer}
         numGuesses={guesses.length}
         onPlayAgain={handlePlayAgain}
+        onClose={closeModal}
         isOpen={showModal}
       />
 
