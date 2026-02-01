@@ -37,8 +37,8 @@ export const GameHeader: FC<GameHeaderProps> = ({
 };
 
 const Logo = () => (
-  <h1 className="select-none text-[clamp(1.25rem,3vw,2rem)] font-bold tracking-[0.1em] text-neutral-900 dark:text-white">
-    Wordle
+  <h1 className="select-none text-[clamp(1.25rem,3vw,2rem)] font-bold tracking-[0.15em] text-neutral-900 dark:text-white uppercase">
+    Wordly
   </h1>
 );
 
