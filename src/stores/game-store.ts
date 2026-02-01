@@ -10,9 +10,9 @@ import {
   getRandomAnswer,
   evaluateGuess,
   mergeKeyboardState,
-  isValidWord,
   validateHardMode,
 } from "@/utils/game-utils";
+import { validateWordWithAPI } from "@/utils/dictionary-api";
 
 type GameMode = "daily" | "random";
 
@@ -26,6 +26,7 @@ export interface GameStoreState {
   currentGuess: string;
   currentRow: number;
   isRevealing: boolean;
+  isValidating: boolean; // true while checking word with API
   isGameOver: boolean;
   isWinner: boolean;
   invalidGuess: boolean;
@@ -43,7 +44,7 @@ export interface GameStoreState {
   handleKey: (key: string, hardMode?: boolean) => void;
   addLetter: (letter: string) => void;
   removeLetter: () => void;
-  submitGuess: (hardMode?: boolean) => void;
+  submitGuess: (hardMode?: boolean) => Promise<void>;
   resetInvalid: () => void;
 }
 
@@ -56,6 +57,7 @@ export const useGameStore = create<GameStoreState>()(
       currentGuess: "",
       currentRow: 0,
       isRevealing: false,
+      isValidating: false,
       isGameOver: false,
       isWinner: false,
       invalidGuess: false,
@@ -79,6 +81,7 @@ export const useGameStore = create<GameStoreState>()(
           currentGuess: "",
           currentRow: 0,
           isRevealing: false,
+          isValidating: false,
           isGameOver: false,
           isWinner: false,
           invalidGuess: false,
@@ -90,8 +93,8 @@ export const useGameStore = create<GameStoreState>()(
       },
 
       addLetter: (letter) => {
-        const { currentGuess, isGameOver } = get();
-        if (isGameOver) return;
+        const { currentGuess, isGameOver, isValidating } = get();
+        if (isGameOver || isValidating) return;
         if (!/^[a-zA-Z]$/.test(letter)) return;
         if (currentGuess.length >= GAME.WORD_LENGTH) return;
         set({
@@ -106,8 +109,8 @@ export const useGameStore = create<GameStoreState>()(
       },
 
       removeLetter: () => {
-        const { currentGuess, isGameOver } = get();
-        if (isGameOver) return;
+        const { currentGuess, isGameOver, isValidating } = get();
+        if (isGameOver || isValidating) return;
         if (currentGuess.length === 0) return;
         set({
           currentGuess: currentGuess.slice(0, -1),
@@ -117,9 +120,9 @@ export const useGameStore = create<GameStoreState>()(
         });
       },
 
-      submitGuess: (hardMode = false) => {
-        const { currentGuess, answer, guesses, evaluations, isGameOver } = get();
-        if (isGameOver) return;
+      submitGuess: async (hardMode = false) => {
+        const { currentGuess, answer, guesses, evaluations, isGameOver, isValidating } = get();
+        if (isGameOver || isValidating) return;
 
         // Check word length
         if (currentGuess.length !== GAME.WORD_LENGTH) {
@@ -133,17 +136,7 @@ export const useGameStore = create<GameStoreState>()(
 
         const guess = normalize(currentGuess);
 
-        // Validate against dictionary
-        if (!isValidWord(guess)) {
-          set({
-            invalidGuess: true,
-            invalidReason: "not_word",
-            invalidMessage: "Not in word list",
-          });
-          return;
-        }
-
-        // Validate hard mode rules
+        // Validate hard mode rules first (no API call needed)
         if (hardMode && guesses.length > 0) {
           const hardModeError = validateHardMode(guess, guesses, evaluations);
           if (hardModeError) {
@@ -154,6 +147,20 @@ export const useGameStore = create<GameStoreState>()(
             });
             return;
           }
+        }
+
+        // Validate against dictionary API
+        set({ isValidating: true });
+        const isValid = await validateWordWithAPI(guess);
+        set({ isValidating: false });
+
+        if (!isValid) {
+          set({
+            invalidGuess: true,
+            invalidReason: "not_word",
+            invalidMessage: "Not in word list",
+          });
+          return;
         }
 
         const evals = evaluateGuess(answer, guess);
