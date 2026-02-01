@@ -4,6 +4,7 @@
 export const STORAGE_KEYS = {
   SCORES: "wordly-scores",
   GAME: "wordly-game",
+  ARCHIVE_COMPLETED: "wordly-archive-completed",
 } as const;
 
 // Game constants - simplified and focused
