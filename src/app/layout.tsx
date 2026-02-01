@@ -2,22 +2,22 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Wordle - A daily word game",
+  title: "Wordly - A daily word game",
   description:
     "Guess the hidden word in 6 tries. A new puzzle is available each day.",
-  keywords: ["word game", "puzzle", "wordle", "vocabulary", "brain teaser"],
-  authors: [{ name: "Wordle" }],
+  keywords: ["word game", "puzzle", "wordly", "vocabulary", "brain teaser"],
+  authors: [{ name: "Wordly" }],
   openGraph: {
-    title: "Wordle - A daily word game",
+    title: "Wordly - A daily word game",
     description: "Guess the hidden word in 6 tries. A new puzzle is available each day.",
     url: "https://wordlyapp.vercel.app",
-    siteName: "Wordle",
+    siteName: "Wordly",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Wordle - A daily word game",
+    title: "Wordly - A daily word game",
     description: "Guess the hidden word in 6 tries. A new puzzle is available each day.",
   },
 };

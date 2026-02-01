@@ -169,8 +169,8 @@ export function getShareText(
 
   const header =
     mode === "daily"
-      ? `Wordle ${puzzleNumber} ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`
-      : `Wordle ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`;
+      ? `Wordly ${puzzleNumber} ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`
+      : `Wordly ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`;
 
   // Use high contrast colors if enabled
   const correct = highContrastMode ? "🟧" : "🟩";

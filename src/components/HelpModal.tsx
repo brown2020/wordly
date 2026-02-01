@@ -16,7 +16,7 @@ export const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose} title="How To Play">
       <div className="space-y-4">
         <p className="text-neutral-700 dark:text-neutral-300">
-          Guess the <strong>WORDLE</strong> in 6 tries.
+          Guess the <strong>WORDLY</strong> in 6 tries.
         </p>
 
         <ul className="list-disc list-inside space-y-2 text-neutral-700 dark:text-neutral-300">
