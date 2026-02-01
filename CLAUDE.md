@@ -1,10 +1,10 @@
-# CLAUDE.md - AI Assistant Guide for Wordly
+# CLAUDE.md - AI Assistant Guide for Wordle Clone
 
-This document provides essential information for AI assistants working with the Wordly codebase.
+This document provides essential information for AI assistants working with this Wordle clone codebase.
 
 ## Project Overview
 
-Wordly is a Wordle-inspired word guessing game built with Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, and Zustand 5. It features daily and random game modes, statistics tracking, and persistent localStorage state.
+A faithful Wordle clone built with Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, and Zustand 5. Features daily puzzles, random practice mode, hard mode, dark theme, high contrast mode, and comprehensive statistics tracking.
 
 **Live Demo:** https://wordlyapp.vercel.app
 
@@ -19,7 +19,7 @@ npm run lint     # Run ESLint checks
 
 **Before committing changes, always run:**
 ```bash
-npm run lint && npm run build
+npx eslint ./src --ext .ts,.tsx && npm run build
 ```
 
 ## Project Structure
@@ -29,32 +29,32 @@ src/
 ├── app/                    # Next.js App Router (pages & layouts)
 │   ├── layout.tsx          # Root layout, metadata, viewport config
 │   ├── page.tsx            # Home page (renders WordlyMain)
-│   ├── globals.css         # Global styles, animations, custom classes
+│   ├── globals.css         # Global styles, dark mode, animations
 │   ├── error.tsx           # Error boundary
 │   ├── loading.tsx         # Loading state
 │   ├── not-found.tsx       # 404 page
-│   └── scores/             # Score history routes
-│       ├── page.tsx        # Full scores page
-│       └── (..)scores/     # Intercepting route for modal
+│   └── scores/             # Score history routes (legacy)
 │
 ├── components/             # React components (all client components)
 │   ├── WordlyMain.tsx      # Main game container, orchestrates layout
 │   ├── GameBoard.tsx       # 6x5 game grid (memoized rows)
 │   ├── GameTile.tsx        # Individual letter tile (memoized)
-│   ├── GameHeader.tsx      # Logo, score display, mode toggle
-│   ├── GameControls.tsx    # Navigation buttons
-│   ├── GameOverModal.tsx   # Win/lose modal with share functionality
-│   ├── GameOverCounter.tsx # Attempts display (X/6)
+│   ├── GameHeader.tsx      # Header with help, stats, settings icons
+│   ├── GameOverModal.tsx   # Win/lose modal with countdown timer
 │   ├── StatsModal.tsx      # Statistics display modal
-│   ├── ScoresClient.tsx    # Score history table
+│   ├── SettingsModal.tsx   # Settings (hard mode, dark mode, etc.)
+│   ├── HelpModal.tsx       # How to play instructions
+│   ├── CountdownTimer.tsx  # Timer until next daily puzzle
 │   ├── keyboard/
 │   │   └── OnscreenKeyboard.tsx  # Interactive keyboard (dynamic import)
 │   └── ui/
 │       ├── Modal.tsx       # Generic modal wrapper
+│       ├── Toast.tsx       # Toast notification component
 │       └── icons.tsx       # SVG icon components
 │
 ├── stores/                 # Zustand state management
-│   └── game-store.ts       # Central game state with persist middleware
+│   ├── game-store.ts       # Central game state with validation
+│   └── settings-store.ts   # User preferences (hardMode, darkMode, etc.)
 │
 ├── hooks/                  # Custom React hooks
 │   ├── useGameController.ts # Game orchestration, keyboard listeners
@@ -62,12 +62,13 @@ src/
 │   └── useScores.ts        # Load scores from localStorage
 │
 ├── utils/                  # Utility functions
-│   ├── game-utils.ts       # Core game logic (evaluate, share text, etc.)
+│   ├── game-utils.ts       # Core game logic, validation, share text
 │   └── stats-utils.ts      # Statistics calculations
 │
 ├── constants/              # Application constants
-│   ├── constants.ts        # Game config, styles, messages, storage keys
-│   └── wordlist.ts         # Curated 5-letter word dictionary
+│   ├── constants.ts        # Game config, tile styles, storage keys
+│   ├── wordlist.ts         # Solution words dictionary
+│   └── valid-words.ts      # Valid guess words dictionary
 │
 └── types/                  # TypeScript type definitions
     └── types.ts            # LetterState, KeyboardState, ScoreData
@@ -84,6 +85,23 @@ src/
 | State | Zustand | 5 |
 | Date Utils | date-fns | 4 |
 | Linting | ESLint | 9 (flat config) |
+
+## Key Features
+
+### Game Modes
+- **Daily Mode** - One puzzle per day, same for all players
+- **Random Mode** - Unlimited practice games (accessible via settings)
+
+### Settings (via gear icon)
+- **Hard Mode** - Must use revealed hints in subsequent guesses
+- **Dark Mode** - Dark theme for reduced eye strain
+- **High Contrast Mode** - Orange/cyan colors for accessibility
+
+### UI Elements
+- **Toast notifications** - Show validation errors ("Not in word list", etc.)
+- **Countdown timer** - Time until next daily puzzle (in game over modal)
+- **Help modal** - How to play instructions (shows on first visit)
+- **Share button** - Copies emoji grid to clipboard
 
 ## Code Conventions
 
@@ -112,10 +130,6 @@ export const ComponentName: FC<ComponentProps> = memo(({ prop1, prop2 }) => {
 ComponentName.displayName = "ComponentName";
 ```
 
-**Memoization:**
-- `GameTile` and `GameRow` use `React.memo()` to prevent unnecessary re-renders
-- Zustand selectors use `useShallow()` for fine-grained updates
-
 ### TypeScript
 
 **Strict mode is enabled.** Always provide type annotations.
@@ -126,45 +140,31 @@ import { GAME } from "@/constants/constants";
 import { LetterState } from "@/types/types";
 ```
 
-**Core Types (`src/types/types.ts`):**
+**Core Types:**
 ```typescript
 type LetterState = "correct" | "present" | "absent" | "unused";
 type KeyboardState = Record<string, Exclude<LetterState, "unused"> | undefined>;
 type GameMode = "daily" | "random";
-
-interface ScoreData {
-  score: number;
-  date: string;
-  attempts: number;
-  word: string;
-  isWin?: boolean;
-}
+type InvalidReason = "not_word" | "hard_mode" | "too_short" | null;
 ```
 
 ### Styling
 
-**Tailwind class organization order:**
-1. Layout (display, position, sizing): `flex`, `grid`, `w-`, `h-`
-2. Spacing (padding, margin, gaps): `p-`, `m-`, `gap-`
-3. Colors & effects: `bg-`, `text-`, `shadow-`, `border-`
-4. Transitions & animations: `transition-`, `animate-`
+**Dark mode support:** All components use `dark:` variant classes.
 
-**Custom CSS classes in `globals.css`:**
-- `.card` - Semi-transparent background with backdrop blur
-- `.card-elevated` - Higher elevation card
-- `.gradient-text` - Blue-to-purple gradient text
-- `.tile-flip` - Game tile flip animation
+**Game tile colors (standard):**
+- Correct: `bg-green-600`
+- Present: `bg-yellow-500`
+- Absent: `bg-neutral-500`
 
-**Game tile colors:**
-- Correct: `bg-emerald-500`
-- Present: `bg-amber-500`
-- Absent: `bg-neutral-600`
+**Game tile colors (high contrast):**
+- Correct: `bg-orange-500`
+- Present: `bg-cyan-500`
+- Absent: `bg-neutral-500`
 
-### State Management (Zustand)
+### State Management
 
-**Store location:** `src/stores/game-store.ts`
-
-**Key state shape:**
+**Game Store (`game-store.ts`):**
 ```typescript
 interface GameStoreState {
   answer: string;
@@ -175,86 +175,70 @@ interface GameStoreState {
   mode: "daily" | "random";
   solutionId: string;
   keyboard: KeyboardState;
-  score: number;
   isRevealing: boolean;
   isGameOver: boolean;
   isWinner: boolean;
   invalidGuess: boolean;
+  invalidReason: InvalidReason;
+  invalidMessage: string;
+  gameInProgress: boolean;  // For hard mode lock
 }
 ```
 
-**Persisted to localStorage:** `mode`, `solutionId`, `score`
-
-**Accessing state:**
+**Settings Store (`settings-store.ts`):**
 ```typescript
-import { useGameStore } from "@/stores/game-store";
-import { useShallow } from "zustand/react/shallow";
-
-// Single value
-const answer = useGameStore((s) => s.answer);
-
-// Multiple values (use useShallow to prevent unnecessary re-renders)
-const { guesses, evaluations } = useGameStore(
-  useShallow((s) => ({ guesses: s.guesses, evaluations: s.evaluations }))
-);
+interface SettingsState {
+  hardMode: boolean;
+  darkMode: boolean;
+  highContrastMode: boolean;
+}
 ```
 
 ## Key Game Logic
 
 **Location:** `src/utils/game-utils.ts`
 
-- `evaluateGuess(answer, guess)` - Two-pass evaluation algorithm handling duplicate letters
-- `getDailyAnswer()` - Returns deterministic daily word based on UTC date
-- `getRandomAnswer()` - Returns random word with timestamp ID
-- `computeDailyIndex(date)` - Days since June 19, 2021 (Wordle epoch)
-- `getShareText()` - Generates emoji grid for sharing results
-
-**Scoring:** Points = `(6 - guessCount) * 10`, zero for losses
+- `isValidWord(word)` - Checks against valid words dictionary
+- `validateHardMode(guess, prevGuesses, prevEvals)` - Hard mode validation
+- `evaluateGuess(answer, guess)` - Two-pass evaluation for duplicate letters
+- `getPuzzleNumber(date)` - Days since June 19, 2021 (Wordle epoch)
+- `getShareText(state, hardMode, highContrastMode)` - Generates emoji grid
 
 ## localStorage Keys
 
-Defined in `src/constants/constants.ts`:
-
 | Key | Purpose |
 |-----|---------|
-| `wordly-game` | Game state (mode, solutionId, score) |
-| `wordly-scores` | Score history array |
-| `wordly-stats` | Statistics data |
+| `wordly-game` | Game state (mode, solutionId) |
+| `wordly-scores` | Game history for statistics |
+| `wordly-settings` | User preferences |
+| `wordly-seen-help` | Whether help was shown |
 
-## Animation Timing
+## Validation Rules
 
-**Tile reveal:** Staggered by `position * 150ms`
-**Game over modal:** Shows after `1500ms` (after all tiles revealed)
-**Reveal end:** `REVEAL_TIME_MS * WORD_LENGTH`
+1. **Word length** - Must be exactly 5 letters
+2. **Dictionary check** - Word must be in valid-words.ts
+3. **Hard mode** (if enabled):
+   - Correct letters must stay in same position
+   - Present letters must be used somewhere
 
 ## Common Tasks
 
-### Adding a New Component
+### Modifying Word Lists
 
-1. Create file in appropriate `src/components/` subdirectory
-2. Add `"use client"` directive at top
-3. Define props interface with TypeScript
-4. Use `memo()` if component receives frequently-changing props
-5. Set `displayName` for React DevTools
+- **Solution words:** `src/constants/wordlist.ts`
+- **Valid guesses:** `src/constants/valid-words.ts`
 
-### Modifying Game Logic
+### Updating Colors/Themes
 
-1. Core logic lives in `src/utils/game-utils.ts`
-2. State mutations happen through Zustand actions in `src/stores/game-store.ts`
-3. Side effects (keyboard listeners, stats persistence) handled in hooks
+1. Standard colors: `src/constants/constants.ts` (TILE_STYLES)
+2. High contrast: `src/constants/constants.ts` (TILE_STYLES_HC)
+3. Keyboard colors: `src/components/keyboard/OnscreenKeyboard.tsx`
 
-### Adding a New Route
+### Adding New Settings
 
-1. Create folder under `src/app/`
-2. Add `page.tsx` with Server or Client Component
-3. For modals, consider using intercepting routes pattern (see `scores/`)
-
-### Updating Styles
-
-1. Tailwind config: `tailwind.config.js` (colors, animations, shadows)
-2. Global styles: `src/app/globals.css`
-3. Component styles: Use Tailwind classes inline
-4. Constants: `src/constants/constants.ts` (TILE_STYLES, BUTTON classes)
+1. Add to `SettingsState` interface in `settings-store.ts`
+2. Add toggle in `SettingsModal.tsx`
+3. Use setting via `useSettingsStore` hook
 
 ## Commit Convention
 
@@ -266,25 +250,25 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `style:` - Code formatting (not CSS)
 - `refactor:` - Code restructuring
 - `perf:` - Performance improvements
-- `test:` - Test additions
-- `chore:` - Maintenance tasks (dependencies, config)
+- `chore:` - Maintenance tasks
 
 ## Validation Checklist
 
 Before submitting changes:
 
-1. `npm run lint` - No linting errors
+1. `npx eslint ./src --ext .ts,.tsx` - No linting errors
 2. `npm run build` - Build succeeds without errors
 3. Test locally with `npm run dev`
-4. Verify TypeScript has no type errors
-5. Test both game modes (daily and random)
-6. Test on mobile viewport if UI changes were made
+4. Test both game modes (daily and random)
+5. Test dark mode and high contrast mode
+6. Test hard mode validation
+7. Test on mobile viewport if UI changes were made
 
 ## Important Notes
 
 - **Daily words** are tied to UTC date, not user's local timezone
-- **Word evaluation** handles duplicate letters correctly (two-pass algorithm)
+- **Word validation** is strict - only words in valid-words.ts are accepted
+- **Hard mode** can only be enabled at the start of a game
+- **Puzzle number** in share text matches original Wordle numbering
 - **No test suite** currently exists - manual testing required
-- **No strict dictionary validation** - any 5-letter combination is accepted
-- **Streak calculation** resets if no win on yesterday or today
 - **Browser support** targets ES2017+ browsers
