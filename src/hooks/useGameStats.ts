@@ -4,16 +4,15 @@ import { STORAGE_KEYS } from "@/constants/constants";
 import { useShallow } from "zustand/shallow";
 
 export function useGameStats() {
-  const { isGameOver, isWinner, guessesLength, score, answer, solutionId } =
+  const { isGameOver, isWinner, guessesLength, answer, solutionId } =
     useGameStore(
-    useShallow((s) => ({
-      isGameOver: s.isGameOver,
-      isWinner: s.isWinner,
-      guessesLength: s.guesses.length,
-      score: s.score,
-      answer: s.answer,
-      solutionId: s.solutionId,
-    }))
+      useShallow((s) => ({
+        isGameOver: s.isGameOver,
+        isWinner: s.isWinner,
+        guessesLength: s.guesses.length,
+        answer: s.answer,
+        solutionId: s.solutionId,
+      }))
     );
 
   const lastSavedRef = useRef<{
@@ -37,14 +36,13 @@ export function useGameStats() {
       return;
     }
 
-    // Persist lightweight score history
+    // Persist game history for statistics
     try {
       const raw = localStorage.getItem(STORAGE_KEYS.SCORES);
       const parsed = raw ? JSON.parse(raw) : [];
       const existing = Array.isArray(parsed) ? parsed : [];
 
       existing.push({
-        score,
         attempts: guessesLength,
         word: answer,
         isWin: isWinner,
@@ -59,8 +57,8 @@ export function useGameStats() {
         savedAt: now,
       };
     } catch (err) {
-      console.error("Failed to save score to localStorage:", err);
+      console.error("Failed to save game to localStorage:", err);
     }
-  }, [isGameOver, isWinner, guessesLength, score, answer, solutionId]);
+  }, [isGameOver, isWinner, guessesLength, answer, solutionId]);
 }
 

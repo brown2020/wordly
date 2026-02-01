@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
+import { useSettingsStore } from "@/stores/settings-store";
 import { useGameStats } from "./useGameStats";
 import { useShallow } from "zustand/shallow";
 
@@ -25,8 +26,10 @@ export function useGameController() {
     if (!useGameStore.getState().answer) {
       useGameStore.getState().startNewGame();
     }
-    const handleKeyDown = (event: KeyboardEvent) =>
-      useGameStore.getState().handleKey(event.key);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const hardMode = useSettingsStore.getState().hardMode;
+      useGameStore.getState().handleKey(event.key, hardMode);
+    };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);

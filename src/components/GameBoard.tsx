@@ -3,65 +3,75 @@ import { FC, memo } from "react";
 import { GAME } from "@/constants/constants";
 import { GameTile } from "./GameTile";
 import { useGameStore } from "@/stores/game-store";
+import { useSettingsStore } from "@/stores/settings-store";
 import { LetterState } from "@/types/types";
 import { useShallow } from "zustand/shallow";
 
-const GameRow: FC<{ rowIndex: number }> = memo(({ rowIndex }) => {
-  const {
-    currentRow,
-    invalidGuess,
-    currentGuess,
-    guess,
-    evaluation,
-    isRevealing,
-  } = useGameStore(
-    useShallow((s) => ({
-      currentRow: s.currentRow,
-      invalidGuess: s.invalidGuess,
-      currentGuess: s.currentGuess,
-      guess: s.guesses[rowIndex],
-      evaluation: s.evaluations[rowIndex],
-      isRevealing: s.isRevealing,
-    }))
-  );
+const GameRow: FC<{ rowIndex: number; highContrastMode: boolean }> = memo(
+  ({ rowIndex, highContrastMode }) => {
+    const {
+      currentRow,
+      invalidGuess,
+      currentGuess,
+      guess,
+      evaluation,
+      isRevealing,
+    } = useGameStore(
+      useShallow((s) => ({
+        currentRow: s.currentRow,
+        invalidGuess: s.invalidGuess,
+        currentGuess: s.currentGuess,
+        guess: s.guesses[rowIndex],
+        evaluation: s.evaluations[rowIndex],
+        isRevealing: s.isRevealing,
+      }))
+    );
 
-  const isCurrent = rowIndex === currentRow;
-  const isInvalidRow = isCurrent && invalidGuess;
-  const isRevealingRow = isRevealing && rowIndex === currentRow - 1;
+    const isCurrent = rowIndex === currentRow;
+    const isInvalidRow = isCurrent && invalidGuess;
+    const isRevealingRow = isRevealing && rowIndex === currentRow - 1;
 
-  return (
-    <div className={`flex gap-1.5 ${isInvalidRow ? "animate-shake" : ""}`}>
-      {[...Array(GAME.WORD_LENGTH)].map((_, colIndex) => {
-        const letter = isCurrent
-          ? currentGuess[colIndex] || ""
-          : guess?.[colIndex] || "";
-        const state: LetterState = isCurrent
-          ? "unused"
-          : (evaluation?.[colIndex] as LetterState) ?? "unused";
+    return (
+      <div className={`flex gap-1.5 ${isInvalidRow ? "animate-shake" : ""}`}>
+        {[...Array(GAME.WORD_LENGTH)].map((_, colIndex) => {
+          const letter = isCurrent
+            ? currentGuess[colIndex] || ""
+            : guess?.[colIndex] || "";
+          const state: LetterState = isCurrent
+            ? "unused"
+            : (evaluation?.[colIndex] as LetterState) ?? "unused";
 
-        return (
-          <GameTile
-            key={`${rowIndex}-${colIndex}`}
-            letter={letter}
-            state={state}
-            isRevealing={isRevealingRow}
-            position={colIndex}
-            isCurrentRow={isCurrent}
-            isInvalidGuess={isInvalidRow}
-          />
-        );
-      })}
-    </div>
-  );
-});
+          return (
+            <GameTile
+              key={`${rowIndex}-${colIndex}`}
+              letter={letter}
+              state={state}
+              isRevealing={isRevealingRow}
+              position={colIndex}
+              isCurrentRow={isCurrent}
+              isInvalidGuess={isInvalidRow}
+              highContrastMode={highContrastMode}
+            />
+          );
+        })}
+      </div>
+    );
+  }
+);
 
 GameRow.displayName = "GameRow";
 
 export const GameBoard: FC = () => {
+  const highContrastMode = useSettingsStore((s) => s.highContrastMode);
+
   return (
     <div className="flex flex-col gap-1.5">
       {[...Array(GAME.MAX_ATTEMPTS)].map((_, rowIndex) => (
-        <GameRow key={rowIndex} rowIndex={rowIndex} />
+        <GameRow
+          key={rowIndex}
+          rowIndex={rowIndex}
+          highContrastMode={highContrastMode}
+        />
       ))}
     </div>
   );

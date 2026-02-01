@@ -1,6 +1,7 @@
 "use client";
 
 import { useGameStore } from "@/stores/game-store";
+import { useSettingsStore } from "@/stores/settings-store";
 import type { LetterState } from "@/types/types";
 
 const ROWS = [
@@ -24,35 +25,48 @@ const KEY_BASE_CLASSES = [
   "px-0",
 ].join(" ");
 
+// Standard colors
 const KEY_STATE_CLASSES: Record<KeyState, string> = {
-  correct: "bg-emerald-600 text-white",
-  present: "bg-amber-500 text-white",
-  absent: "bg-neutral-600 text-white",
+  correct: "bg-green-600 text-white",
+  present: "bg-yellow-500 text-white",
+  absent: "bg-neutral-500 dark:bg-neutral-600 text-white",
 };
 
-const getKeyClasses = (k: string, state?: KeyState) => {
-  const base = [
-    KEY_BASE_CLASSES,
-  ].join(" ");
+// High contrast colors
+const KEY_STATE_CLASSES_HC: Record<KeyState, string> = {
+  correct: "bg-orange-500 text-white",
+  present: "bg-cyan-500 text-white",
+  absent: "bg-neutral-500 dark:bg-neutral-600 text-white",
+};
+
+const getKeyClasses = (k: string, state?: KeyState, highContrast = false) => {
+  const stateClasses = highContrast ? KEY_STATE_CLASSES_HC : KEY_STATE_CLASSES;
 
   const chrome = state
-    ? KEY_STATE_CLASSES[state] ?? "bg-neutral-300 text-neutral-900"
-    : "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-400";
+    ? stateClasses[state] ?? "bg-neutral-300 dark:bg-neutral-700 text-neutral-900 dark:text-white"
+    : "bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white hover:bg-neutral-300 dark:hover:bg-neutral-600 active:bg-neutral-400";
 
   const isWide = k === "Enter" || k === "Back";
   const width = isWide
     ? "flex-[1.5] min-w-[3.6rem] max-w-[5.5rem]"
     : "flex-1 min-w-[1.9rem] max-w-[3.25rem]";
 
-  return `${base} ${width} ${chrome}`;
+  return `${KEY_BASE_CLASSES} ${width} ${chrome}`;
 };
 
 export default function OnscreenKeyboard() {
   const handleKey = useGameStore((s) => s.handleKey);
   const keyboard = useGameStore((s) => s.keyboard);
+  const hardMode = useSettingsStore((s) => s.hardMode);
+  const highContrastMode = useSettingsStore((s) => s.highContrastMode);
+
+  const onKeyClick = (key: string) => {
+    handleKey(key === "Back" ? "Backspace" : key, hardMode);
+  };
+
   return (
     <div className="mx-auto w-full max-w-[520px] select-none">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1.5">
         {ROWS.map((row, i) => (
           <div
             key={i}
@@ -65,8 +79,8 @@ export default function OnscreenKeyboard() {
               <button
                 key={k}
                 type="button"
-                className={getKeyClasses(k, keyboard[k])}
-                onClick={() => handleKey(k === "Back" ? "Backspace" : k)}
+                className={getKeyClasses(k, keyboard[k], highContrastMode)}
+                onClick={() => onKeyClick(k)}
                 aria-label={k === "Back" ? "Backspace" : k}
               >
                 {k === "Back" ? "⌫" : k}

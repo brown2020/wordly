@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { GameOverModal } from "@/components/GameOverModal";
 import { GameHeader } from "@/components/GameHeader";
 import StatsModal from "@/components/StatsModal";
-import { GAME, LAYOUT } from "@/constants/constants";
+import SettingsModal from "@/components/SettingsModal";
+import HelpModal from "@/components/HelpModal";
+import { Toast } from "@/components/ui/Toast";
+import { LAYOUT } from "@/constants/constants";
 import dynamic from "next/dynamic";
 import { useGameController } from "@/hooks/useGameController";
-import { AttemptsCounter } from "@/components/AttemptsCounter";
-import { GameControls } from "@/components/GameControls";
+import { useGameStore } from "@/stores/game-store";
+import { useSettingsStore } from "@/stores/settings-store";
 
 const OnscreenKeyboard = dynamic(
   () => import("@/components/keyboard/OnscreenKeyboard"),
@@ -21,33 +24,64 @@ export default function WordlyMain() {
     useGameController();
 
   const [showStats, setShowStats] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  // Get toast message from game store
+  const invalidMessage = useGameStore((s) => s.invalidMessage);
+  const invalidGuess = useGameStore((s) => s.invalidGuess);
+  const resetInvalid = useGameStore((s) => s.resetInvalid);
+
+  // Get dark mode setting
+  const darkMode = useSettingsStore((s) => s.darkMode);
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
+  // Show help on first visit
+  useEffect(() => {
+    const hasSeenHelp = localStorage.getItem("wordly-seen-help");
+    if (!hasSeenHelp) {
+      setShowHelp(true);
+      localStorage.setItem("wordly-seen-help", "true");
+    }
+  }, []);
 
   return (
     <div className={LAYOUT.container}>
-      {/* Wordle-like frame: header top, board centered, keyboard bottom */}
-      <div className="sticky top-0 z-20 -mx-2 sm:-mx-4 border-b border-neutral-200/70 bg-white/80 px-2 backdrop-blur-sm sm:px-4">
-        <GameHeader />
+      {/* Toast for validation messages */}
+      <Toast
+        message={invalidMessage}
+        isVisible={invalidGuess && !!invalidMessage}
+        onHide={resetInvalid}
+      />
+
+      {/* Header with icons */}
+      <div className="sticky top-0 z-20 -mx-2 sm:-mx-4 border-b border-neutral-200 dark:border-neutral-700 bg-white/95 dark:bg-neutral-900/95 px-2 backdrop-blur-sm sm:px-4">
+        <GameHeader
+          onShowHelp={() => setShowHelp(true)}
+          onShowStats={() => setShowStats(true)}
+          onShowSettings={() => setShowSettings(true)}
+        />
       </div>
 
-      <main className="flex flex-1 flex-col items-center justify-center py-3">
-        <div className="flex flex-col items-center gap-3">
-          <GameBoard />
-          <AttemptsCounter
-            attempts={guesses.length}
-            maxAttempts={GAME.MAX_ATTEMPTS}
-          />
-        </div>
+      {/* Game board */}
+      <main className="flex flex-1 flex-col items-center justify-center py-4">
+        <GameBoard />
       </main>
 
-      <footer className="pt-2 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
-        <div className="w-full">
-          <OnscreenKeyboard />
-          <div className="mt-3">
-            <GameControls onShowStats={() => setShowStats(true)} />
-          </div>
-        </div>
+      {/* Keyboard */}
+      <footer className="pt-2 pb-[max(env(safe-area-inset-bottom),0.5rem)]">
+        <OnscreenKeyboard />
       </footer>
 
+      {/* Modals */}
       <GameOverModal
         isWinner={isWinner}
         wordToGuess={answer}
@@ -57,6 +91,11 @@ export default function WordlyMain() {
       />
 
       <StatsModal isOpen={showStats} onClose={() => setShowStats(false)} />
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
     </div>
   );
 }

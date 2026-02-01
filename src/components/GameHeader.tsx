@@ -1,49 +1,60 @@
-import { useGameStore } from "@/stores/game-store";
-import { StarIcon } from "./ui/icons";
+import { FC } from "react";
+import { HelpIcon, StatsIcon, SettingsIcon } from "./ui/icons";
 
-export const GameHeader = () => {
-  const score = useGameStore((s) => s.score);
+interface GameHeaderProps {
+  onShowHelp: () => void;
+  onShowStats: () => void;
+  onShowSettings: () => void;
+}
+
+export const GameHeader: FC<GameHeaderProps> = ({
+  onShowHelp,
+  onShowStats,
+  onShowSettings,
+}) => {
   return (
     <header className="grid h-14 grid-cols-3 items-center">
       <div className="flex items-center justify-start">
-        <ModeToggle />
+        <IconButton onClick={onShowHelp} label="How to play">
+          <HelpIcon className="w-6 h-6" />
+        </IconButton>
       </div>
 
       <div className="flex items-center justify-center">
         <Logo />
       </div>
 
-      <div className="flex items-center justify-end">
-        <ScoreDisplay score={score} />
+      <div className="flex items-center justify-end gap-1">
+        <IconButton onClick={onShowStats} label="Statistics">
+          <StatsIcon className="w-6 h-6" />
+        </IconButton>
+        <IconButton onClick={onShowSettings} label="Settings">
+          <SettingsIcon className="w-6 h-6" />
+        </IconButton>
       </div>
     </header>
   );
 };
 
 const Logo = () => (
-  <h1 className="select-none text-[clamp(1.125rem,2.2vw,1.5rem)] font-semibold tracking-[0.25em] text-neutral-900">
-    WORDLY
+  <h1 className="select-none text-[clamp(1.25rem,3vw,2rem)] font-bold tracking-[0.1em] text-neutral-900 dark:text-white">
+    Wordle
   </h1>
 );
 
-const ScoreDisplay = ({ score }: { score: number }) => (
-  <div className="flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700">
-    <StarIcon className="h-4 w-4 text-neutral-700" />
-    <span className="tabular-nums">{score}</span>
-  </div>
-);
+interface IconButtonProps {
+  onClick: () => void;
+  label: string;
+  children: React.ReactNode;
+}
 
-const ModeToggle = () => {
-  const mode = useGameStore((s) => s.mode);
-  const startNewGame = useGameStore((s) => s.startNewGame);
-  const nextMode = mode === "daily" ? "random" : "daily";
-  return (
-    <button
-      onClick={() => startNewGame(nextMode)}
-      className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50 active:bg-neutral-100"
-      title={`Switch to ${nextMode} mode`}
-    >
-      {mode === "daily" ? "Daily" : "Random"}
-    </button>
-  );
-};
+const IconButton: FC<IconButtonProps> = ({ onClick, label, children }) => (
+  <button
+    onClick={onClick}
+    className="p-1.5 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
+    aria-label={label}
+    title={label}
+  >
+    {children}
+  </button>
+);
