@@ -5,12 +5,14 @@ import { useSettingsStore } from "@/stores/settings-store";
 import { getShareText } from "@/utils/game-utils";
 import { useShallow } from "zustand/shallow";
 import CountdownTimer from "./CountdownTimer";
+import { CloseIcon } from "./ui/icons";
 
 interface GameOverModalProps {
   isWinner: boolean;
   wordToGuess: string;
   numGuesses: number;
   onPlayAgain: () => void;
+  onClose: () => void;
   isOpen: boolean;
 }
 
@@ -19,6 +21,7 @@ export const GameOverModal: FC<GameOverModalProps> = ({
   wordToGuess,
   numGuesses,
   onPlayAgain,
+  onClose,
   isOpen,
 }) => {
   const mode = useGameStore((s) => s.mode);
@@ -27,7 +30,15 @@ export const GameOverModal: FC<GameOverModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 max-w-sm w-full text-center">
+      <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 max-w-sm w-full text-center relative">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors"
+          aria-label="Close"
+        >
+          <CloseIcon className="w-5 h-5" />
+        </button>
         {isWinner ? (
           <p className="text-sm uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-2">
             {numGuesses === 1

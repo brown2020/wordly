@@ -50,9 +50,14 @@ export function useGameController() {
     startNewGame();
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   return {
     showModal,
     handlePlayAgain,
+    closeModal,
     guesses,
     isWinner,
     answer,
