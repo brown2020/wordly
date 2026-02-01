@@ -1,11 +1,7 @@
 import { GameStoreState } from "@/stores/game-store";
 import { GAME } from "@/constants/constants";
 import { wordList } from "@/constants/wordlist";
-import { isValidWord } from "@/constants/valid-words";
 import { LetterState, KeyboardState } from "@/types/types";
-
-// Re-export for convenience
-export { isValidWord };
 
 export function normalize(word: string): string {
   return word.trim().toUpperCase();
