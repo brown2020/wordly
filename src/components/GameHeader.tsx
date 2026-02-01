@@ -1,22 +1,27 @@
 import { FC } from "react";
-import { HelpIcon, StatsIcon, SettingsIcon } from "./ui/icons";
+import { HelpIcon, StatsIcon, SettingsIcon, ArchiveIcon } from "./ui/icons";
 
 interface GameHeaderProps {
   onShowHelp: () => void;
   onShowStats: () => void;
   onShowSettings: () => void;
+  onShowArchive: () => void;
 }
 
 export const GameHeader: FC<GameHeaderProps> = ({
   onShowHelp,
   onShowStats,
   onShowSettings,
+  onShowArchive,
 }) => {
   return (
     <header className="grid h-14 grid-cols-3 items-center">
-      <div className="flex items-center justify-start">
+      <div className="flex items-center justify-start gap-1">
         <IconButton onClick={onShowHelp} label="How to play">
           <HelpIcon className="w-6 h-6" />
+        </IconButton>
+        <IconButton onClick={onShowArchive} label="Puzzle archive">
+          <ArchiveIcon className="w-6 h-6" />
         </IconButton>
       </div>
 

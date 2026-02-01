@@ -27,7 +27,7 @@ export async function validateWordWithAPI(word: string): Promise<boolean> {
     const isValid = response.ok;
     validatedWordsCache.set(normalizedWord, isValid);
     return isValid;
-  } catch (error) {
+  } catch {
     // Network error or timeout - don't cache, return true to allow the word
     // This prevents blocking gameplay when offline
     console.warn("Dictionary API unavailable, allowing word:", normalizedWord);
