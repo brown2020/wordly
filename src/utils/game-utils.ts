@@ -1,10 +1,70 @@
 import { GameStoreState } from "@/stores/game-store";
 import { GAME } from "@/constants/constants";
 import { wordList } from "@/constants/wordlist";
+import { isValidWord } from "@/constants/valid-words";
 import { LetterState, KeyboardState } from "@/types/types";
+
+// Re-export for convenience
+export { isValidWord };
 
 export function normalize(word: string): string {
   return word.trim().toUpperCase();
+}
+
+/**
+ * Get the puzzle number (days since Wordle epoch)
+ */
+export function getPuzzleNumber(date: Date = new Date()): number {
+  const epoch = Date.UTC(2021, 5, 19); // June 19, 2021
+  const dayMs = 24 * 60 * 60 * 1000;
+  const today = Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  );
+  return Math.floor((today - epoch) / dayMs);
+}
+
+/**
+ * Validate a guess against hard mode rules.
+ * Returns null if valid, or an error message if invalid.
+ */
+export function validateHardMode(
+  guess: string,
+  previousGuesses: string[],
+  previousEvaluations: LetterState[][]
+): string | null {
+  if (previousGuesses.length === 0) return null;
+
+  const lastGuess = previousGuesses[previousGuesses.length - 1];
+  const lastEval = previousEvaluations[previousEvaluations.length - 1];
+
+  // Check that all correct letters are in the same position
+  for (let i = 0; i < lastEval.length; i++) {
+    if (lastEval[i] === "correct" && guess[i] !== lastGuess[i]) {
+      const pos = i + 1;
+      const letter = lastGuess[i];
+      return `${pos}${getOrdinalSuffix(pos)} letter must be ${letter}`;
+    }
+  }
+
+  // Check that all present letters are used somewhere
+  for (let i = 0; i < lastEval.length; i++) {
+    if (lastEval[i] === "present") {
+      const letter = lastGuess[i];
+      if (!guess.includes(letter)) {
+        return `Guess must contain ${letter}`;
+      }
+    }
+  }
+
+  return null;
+}
+
+function getOrdinalSuffix(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
 }
 
 export function computeDailyIndex(date: Date): number {
@@ -97,17 +157,30 @@ export function getShareText(
   state: Pick<
     GameStoreState,
     "isWinner" | "guesses" | "evaluations" | "mode" | "solutionId"
-  >
+  >,
+  hardMode: boolean = false,
+  highContrastMode: boolean = false
 ) {
   const { isWinner, guesses, evaluations, mode, solutionId } = state;
+
+  // Use puzzle number for daily mode (like original Wordle)
+  const puzzleNumber = mode === "daily" ? getPuzzleNumber(new Date(solutionId)) : null;
+  const hardModeIndicator = hardMode ? "*" : "";
+
   const header =
     mode === "daily"
-      ? `Wordly ${solutionId} ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}`
-      : `Wordly ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}`;
+      ? `Wordle ${puzzleNumber} ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`
+      : `Wordle ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`;
+
+  // Use high contrast colors if enabled
+  const correct = highContrastMode ? "🟧" : "🟩";
+  const present = highContrastMode ? "🟦" : "🟨";
+  const absent = "⬛";
+
   const rows = evaluations
     .map((evalRow) =>
       evalRow
-        .map((s) => (s === "correct" ? "🟩" : s === "present" ? "🟨" : "⬛"))
+        .map((s) => (s === "correct" ? correct : s === "present" ? present : absent))
         .join("")
     )
     .join("\n");
