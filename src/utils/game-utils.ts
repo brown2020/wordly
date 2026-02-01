@@ -84,6 +84,29 @@ export function getDailyAnswer(): { answer: string; id: string } {
   return { answer: ans, id };
 }
 
+/**
+ * Get the answer for a specific puzzle number (archive mode)
+ */
+export function getArchiveAnswer(puzzleNumber: number): { answer: string; id: string; puzzleNumber: number } {
+  // Convert puzzle number back to date for validation
+  const epoch = Date.UTC(2021, 5, 19); // June 19, 2021
+  const dayMs = 24 * 60 * 60 * 1000;
+  const puzzleDate = new Date(epoch + puzzleNumber * dayMs);
+
+  // Compute word index (wraps around word list)
+  const index = ((puzzleNumber % wordList.length) + wordList.length) % wordList.length;
+  const ans = normalize(wordList[index]);
+  const id = puzzleDate.toISOString().slice(0, 10); // YYYY-MM-DD
+  return { answer: ans, id, puzzleNumber };
+}
+
+/**
+ * Get the current puzzle number (for determining max archive puzzle)
+ */
+export function getCurrentPuzzleNumber(): number {
+  return getPuzzleNumber(new Date());
+}
+
 export function getRandomAnswer(): { answer: string; id: string } {
   const index = Math.floor(Math.random() * wordList.length);
   const ans = normalize(wordList[index]);
@@ -152,21 +175,22 @@ export function mergeKeyboardState(
 export function getShareText(
   state: Pick<
     GameStoreState,
-    "isWinner" | "guesses" | "evaluations" | "mode" | "solutionId"
+    "isWinner" | "guesses" | "evaluations" | "mode" | "solutionId" | "puzzleNumber"
   >,
   hardMode: boolean = false,
   highContrastMode: boolean = false
 ) {
-  const { isWinner, guesses, evaluations, mode, solutionId } = state;
+  const { isWinner, guesses, evaluations, mode, solutionId, puzzleNumber: statePuzzleNumber } = state;
 
-  // Use puzzle number for daily mode (like original Wordle)
-  const puzzleNumber = mode === "daily" ? getPuzzleNumber(new Date(solutionId)) : null;
+  // Use puzzle number for daily/archive mode (like original Wordle)
+  const puzzleNumber = (mode === "daily" || mode === "archive")
+    ? (statePuzzleNumber ?? getPuzzleNumber(new Date(solutionId)))
+    : null;
   const hardModeIndicator = hardMode ? "*" : "";
 
-  const header =
-    mode === "daily"
-      ? `Wordly ${puzzleNumber} ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`
-      : `Wordly ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`;
+  const header = puzzleNumber !== null
+    ? `Wordly ${puzzleNumber} ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`
+    : `Wordly ${isWinner ? guesses.length : "X"}/${GAME.MAX_ATTEMPTS}${hardModeIndicator}`;
 
   // Use high contrast colors if enabled
   const correct = highContrastMode ? "🟧" : "🟩";

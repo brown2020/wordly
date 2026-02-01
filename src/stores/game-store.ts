@@ -8,13 +8,14 @@ import {
   normalize,
   getDailyAnswer,
   getRandomAnswer,
+  getArchiveAnswer,
   evaluateGuess,
   mergeKeyboardState,
   validateHardMode,
 } from "@/utils/game-utils";
 import { validateWordWithAPI } from "@/utils/dictionary-api";
 
-type GameMode = "daily" | "random";
+type GameMode = "daily" | "random" | "archive";
 
 export type InvalidReason = "not_word" | "hard_mode" | "too_short" | null;
 
@@ -36,11 +37,12 @@ export interface GameStoreState {
   // Meta
   mode: GameMode;
   solutionId: string; // YYYY-MM-DD for daily or random seed id
+  puzzleNumber: number | null; // puzzle number for daily/archive modes
   keyboard: KeyboardState; // letter -> best-known state
   gameInProgress: boolean; // whether a game has been started (for hard mode lock)
 
   // Actions
-  startNewGame: (mode?: GameMode) => void;
+  startNewGame: (mode?: GameMode, puzzleNumber?: number) => void;
   handleKey: (key: string, hardMode?: boolean) => void;
   addLetter: (letter: string) => void;
   removeLetter: () => void;
@@ -65,16 +67,40 @@ export const useGameStore = create<GameStoreState>()(
       invalidMessage: "",
       mode: "daily",
       solutionId: "",
+      puzzleNumber: null,
       keyboard: {},
       gameInProgress: false,
 
-      startNewGame: (mode) => {
+      startNewGame: (mode, archivePuzzleNumber) => {
         const desiredMode = mode ?? get().mode ?? "daily";
-        const { answer, id } =
-          desiredMode === "daily" ? getDailyAnswer() : getRandomAnswer();
+        let answer: string;
+        let id: string;
+        let puzzleNum: number | null = null;
+
+        if (desiredMode === "archive" && archivePuzzleNumber !== undefined) {
+          const result = getArchiveAnswer(archivePuzzleNumber);
+          answer = result.answer;
+          id = result.id;
+          puzzleNum = archivePuzzleNumber;
+        } else if (desiredMode === "daily") {
+          const result = getDailyAnswer();
+          answer = result.answer;
+          id = result.id;
+          // Get puzzle number for daily mode
+          const epoch = Date.UTC(2021, 5, 19);
+          const dayMs = 24 * 60 * 60 * 1000;
+          const today = Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
+          puzzleNum = Math.floor((today - epoch) / dayMs);
+        } else {
+          const result = getRandomAnswer();
+          answer = result.answer;
+          id = result.id;
+        }
+
         set({
           answer,
           solutionId: id,
+          puzzleNumber: puzzleNum,
           mode: desiredMode,
           guesses: [],
           evaluations: [],
@@ -217,6 +243,7 @@ export const useGameStore = create<GameStoreState>()(
       partialize: (state) => ({
         mode: state.mode,
         solutionId: state.solutionId,
+        puzzleNumber: state.puzzleNumber,
       }),
     }
   )

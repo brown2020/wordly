@@ -59,7 +59,7 @@ export const GameOverModal: FC<GameOverModalProps> = ({
         )}
 
         <div className="flex gap-3 mt-4">
-          {mode === "random" && (
+          {(mode === "random" || mode === "archive") && (
             <button
               onClick={onPlayAgain}
               className="flex-1 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-900 dark:text-white font-bold py-3 px-6 rounded transition-colors"
@@ -75,13 +75,14 @@ export const GameOverModal: FC<GameOverModalProps> = ({
 };
 
 const ShareButton: FC = () => {
-  const { isWinner, guesses, evaluations, mode, solutionId } = useGameStore(
+  const { isWinner, guesses, evaluations, mode, solutionId, puzzleNumber } = useGameStore(
     useShallow((s) => ({
       isWinner: s.isWinner,
       guesses: s.guesses,
       evaluations: s.evaluations,
       mode: s.mode,
       solutionId: s.solutionId,
+      puzzleNumber: s.puzzleNumber,
     }))
   );
 
@@ -96,7 +97,7 @@ const ShareButton: FC = () => {
 
   const share = useCallback(async () => {
     const text = getShareText(
-      { isWinner, guesses, evaluations, mode, solutionId },
+      { isWinner, guesses, evaluations, mode, solutionId, puzzleNumber },
       hardMode,
       highContrastMode
     );
@@ -113,7 +114,7 @@ const ShareButton: FC = () => {
         }
       }
     }
-  }, [isWinner, guesses, evaluations, mode, solutionId, hardMode, highContrastMode]);
+  }, [isWinner, guesses, evaluations, mode, solutionId, puzzleNumber, hardMode, highContrastMode]);
 
   return (
     <button

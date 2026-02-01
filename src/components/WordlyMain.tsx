@@ -7,6 +7,7 @@ import { GameHeader } from "@/components/GameHeader";
 import StatsModal from "@/components/StatsModal";
 import SettingsModal from "@/components/SettingsModal";
 import HelpModal from "@/components/HelpModal";
+import ArchiveModal from "@/components/ArchiveModal";
 import { Toast } from "@/components/ui/Toast";
 import { LAYOUT } from "@/constants/constants";
 import dynamic from "next/dynamic";
@@ -26,6 +27,7 @@ export default function WordlyMain() {
   const [showStats, setShowStats] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showArchive, setShowArchive] = useState(false);
 
   // Get toast message from game store
   const invalidMessage = useGameStore((s) => s.invalidMessage);
@@ -68,6 +70,7 @@ export default function WordlyMain() {
           onShowHelp={() => setShowHelp(true)}
           onShowStats={() => setShowStats(true)}
           onShowSettings={() => setShowSettings(true)}
+          onShowArchive={() => setShowArchive(true)}
         />
       </div>
 
@@ -96,6 +99,7 @@ export default function WordlyMain() {
         onClose={() => setShowSettings(false)}
       />
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <ArchiveModal isOpen={showArchive} onClose={() => setShowArchive(false)} />
     </div>
   );
 }

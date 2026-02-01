@@ -4,7 +4,7 @@ import { STORAGE_KEYS } from "@/constants/constants";
 import { useShallow } from "zustand/shallow";
 
 export function useGameStats() {
-  const { isGameOver, isWinner, guessesLength, answer, solutionId } =
+  const { isGameOver, isWinner, guessesLength, answer, solutionId, mode, puzzleNumber } =
     useGameStore(
       useShallow((s) => ({
         isGameOver: s.isGameOver,
@@ -12,6 +12,8 @@ export function useGameStats() {
         guessesLength: s.guesses.length,
         answer: s.answer,
         solutionId: s.solutionId,
+        mode: s.mode,
+        puzzleNumber: s.puzzleNumber,
       }))
     );
 
@@ -47,9 +49,41 @@ export function useGameStats() {
         word: answer,
         isWin: isWinner,
         date: new Date().toISOString(),
+        mode,
+        puzzleNumber,
       });
       localStorage.setItem(STORAGE_KEYS.SCORES, JSON.stringify(existing));
       window.dispatchEvent(new Event("wordly:scores-updated"));
+
+      // Also save to archive progress if it's an archive or daily puzzle
+      if ((mode === "archive" || mode === "daily") && puzzleNumber !== null) {
+        try {
+          const archiveRaw = localStorage.getItem(STORAGE_KEYS.ARCHIVE_COMPLETED);
+          const archiveParsed = archiveRaw ? JSON.parse(archiveRaw) : [];
+          const archiveExisting = Array.isArray(archiveParsed) ? archiveParsed : [];
+
+          // Check if this puzzle is already recorded
+          const alreadyRecorded = archiveExisting.some(
+            (r: { puzzleNumber: number }) => r.puzzleNumber === puzzleNumber
+          );
+
+          if (!alreadyRecorded) {
+            archiveExisting.push({
+              puzzleNumber,
+              attempts: guessesLength,
+              isWin: isWinner,
+              completedAt: new Date().toISOString(),
+            });
+            localStorage.setItem(
+              STORAGE_KEYS.ARCHIVE_COMPLETED,
+              JSON.stringify(archiveExisting)
+            );
+          }
+        } catch (archiveErr) {
+          console.error("Failed to save archive progress:", archiveErr);
+        }
+      }
+
       lastSavedRef.current = {
         solutionId,
         guessesLength,
@@ -59,6 +93,6 @@ export function useGameStats() {
     } catch (err) {
       console.error("Failed to save game to localStorage:", err);
     }
-  }, [isGameOver, isWinner, guessesLength, answer, solutionId]);
+  }, [isGameOver, isWinner, guessesLength, answer, solutionId, mode, puzzleNumber]);
 }
 
