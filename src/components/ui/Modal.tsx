@@ -21,15 +21,15 @@ export const Modal: FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/70 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div
-        className={`bg-white rounded-lg shadow-xl ${maxWidth} w-full overflow-hidden`}
+        className={`bg-white dark:bg-neutral-800 rounded-lg shadow-xl ${maxWidth} w-full overflow-hidden max-h-[90vh] overflow-y-auto`}
       >
-        <div className="flex items-center justify-between border-b border-neutral-200 p-4">
-          <h2 className="text-xl font-semibold text-neutral-900">{title}</h2>
+        <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-700 p-4">
+          <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">{title}</h2>
           <button
             onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-500"
+            className="text-neutral-400 hover:text-neutral-500 dark:text-neutral-500 dark:hover:text-neutral-400"
             aria-label="Close"
           >
             <CloseIcon />

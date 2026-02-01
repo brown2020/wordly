@@ -1,6 +1,6 @@
 // components/GameTile.tsx
 import { FC, memo } from "react";
-import { TILE_STYLES } from "@/constants/constants";
+import { TILE_STYLES, TILE_STYLES_HC } from "@/constants/constants";
 import type { LetterState } from "@/types/types";
 
 interface GameTileProps {
@@ -10,14 +10,15 @@ interface GameTileProps {
   position: number;
   isCurrentRow: boolean;
   isInvalidGuess?: boolean;
+  highContrastMode?: boolean;
 }
 
-const STATE_STYLES: Record<LetterState, string> = {
-  correct: TILE_STYLES.correct,
-  present: TILE_STYLES.present,
-  absent: TILE_STYLES.absent,
+const getStateStyles = (highContrast: boolean): Record<LetterState, string> => ({
+  correct: highContrast ? TILE_STYLES_HC.correct : TILE_STYLES.correct,
+  present: highContrast ? TILE_STYLES_HC.present : TILE_STYLES.present,
+  absent: highContrast ? TILE_STYLES_HC.absent : TILE_STYLES.absent,
   unused: TILE_STYLES.empty,
-} as const;
+});
 
 export const GameTile: FC<GameTileProps> = memo(
   ({
@@ -27,12 +28,15 @@ export const GameTile: FC<GameTileProps> = memo(
     position,
     isCurrentRow,
     isInvalidGuess = false,
+    highContrastMode = false,
   }) => {
+    const STATE_STYLES = getStateStyles(highContrastMode);
+
     const stateClasses = (() => {
-      if (isInvalidGuess) return "border-red-400 bg-red-50 text-red-700";
+      if (isInvalidGuess) return "border-red-400 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400";
       if (!letter) return TILE_STYLES.empty;
       if (isCurrentRow) return TILE_STYLES.current;
-      if (state === "unused") return TILE_STYLES.filled; // Filled but not yet evaluated
+      if (state === "unused") return TILE_STYLES.filled;
       return STATE_STYLES[state];
     })();
 
