@@ -1,7 +1,13 @@
 import { GameStoreState } from "@/stores/game-store";
 import { GAME } from "@/constants/constants";
 import { wordList } from "@/constants/wordlist";
-import { LetterState, KeyboardState } from "@/types/types";
+import { GameMode, LetterState, KeyboardState } from "@/types/types";
+
+type PuzzleDetails = {
+  answer: string;
+  id: string;
+  puzzleNumber: number | null;
+};
 
 export function normalize(word: string): string {
   return word.trim().toUpperCase();
@@ -84,6 +90,17 @@ export function getDailyAnswer(): { answer: string; id: string } {
   return { answer: ans, id };
 }
 
+export function getDailyPuzzle(date: Date = new Date()): PuzzleDetails {
+  const index = computeDailyIndex(date);
+  const answer = normalize(wordList[index]);
+  const id = date.toISOString().slice(0, 10);
+  return {
+    answer,
+    id,
+    puzzleNumber: getPuzzleNumber(date),
+  };
+}
+
 /**
  * Get the answer for a specific puzzle number (archive mode)
  */
@@ -112,6 +129,26 @@ export function getRandomAnswer(): { answer: string; id: string } {
   const ans = normalize(wordList[index]);
   const id = `rand-${Date.now()}`;
   return { answer: ans, id };
+}
+
+export function getPuzzleForMode(
+  mode: GameMode,
+  archivePuzzleNumber?: number
+): PuzzleDetails {
+  if (mode === "archive" && archivePuzzleNumber !== undefined) {
+    return getArchiveAnswer(archivePuzzleNumber);
+  }
+
+  if (mode === "daily") {
+    return getDailyPuzzle();
+  }
+
+  const { answer, id } = getRandomAnswer();
+  return {
+    answer,
+    id,
+    puzzleNumber: null,
+  };
 }
 
 export function evaluateGuess(answer: string, guess: string): LetterState[] {

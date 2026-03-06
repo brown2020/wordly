@@ -1,32 +1,37 @@
 import { useState, useEffect, useCallback } from "react";
-import { STORAGE_KEYS } from "@/constants/constants";
-
-interface ArchiveRecord {
-  puzzleNumber: number;
-  attempts: number;
-  isWin: boolean;
-  completedAt: string;
-}
+import { ArchiveRecord } from "@/types/types";
+import {
+  ARCHIVE_UPDATED_EVENT,
+  readArchiveRecords,
+  upsertArchiveRecord,
+} from "@/utils/storage-utils";
 
 export function useArchiveProgress() {
   const [completedPuzzles, setCompletedPuzzles] = useState<Map<number, ArchiveRecord>>(new Map());
 
-  // Load completed puzzles from localStorage
-  useEffect(() => {
+  const loadArchiveProgress = useCallback(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEYS.ARCHIVE_COMPLETED);
-      if (raw) {
-        const parsed: ArchiveRecord[] = JSON.parse(raw);
-        const map = new Map<number, ArchiveRecord>();
-        parsed.forEach((record) => {
-          map.set(record.puzzleNumber, record);
-        });
-        setCompletedPuzzles(map);
-      }
+      const map = new Map<number, ArchiveRecord>();
+      readArchiveRecords().forEach((record) => {
+        map.set(record.puzzleNumber, record);
+      });
+      setCompletedPuzzles(map);
     } catch (err) {
       console.error("Failed to load archive progress:", err);
     }
   }, []);
+
+  // Load completed puzzles from localStorage
+  useEffect(() => {
+    loadArchiveProgress();
+    const handleArchiveUpdate = () => loadArchiveProgress();
+    window.addEventListener("storage", handleArchiveUpdate);
+    window.addEventListener(ARCHIVE_UPDATED_EVENT, handleArchiveUpdate);
+    return () => {
+      window.removeEventListener("storage", handleArchiveUpdate);
+      window.removeEventListener(ARCHIVE_UPDATED_EVENT, handleArchiveUpdate);
+    };
+  }, [loadArchiveProgress]);
 
   // Mark a puzzle as completed
   const markCompleted = useCallback(
@@ -44,8 +49,7 @@ export function useArchiveProgress() {
 
         // Persist to localStorage
         try {
-          const arr = Array.from(next.values());
-          localStorage.setItem(STORAGE_KEYS.ARCHIVE_COMPLETED, JSON.stringify(arr));
+          upsertArchiveRecord(record);
         } catch (err) {
           console.error("Failed to save archive progress:", err);
         }

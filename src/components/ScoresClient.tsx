@@ -76,7 +76,7 @@ export default function ScoresClient() {
                   {score.attempts}/{GAME.MAX_ATTEMPTS}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
-                  {score.score}
+                  {score.score ?? "-"}
                 </td>
               </tr>
             ))}

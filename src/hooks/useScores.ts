@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ScoreData } from "@/types/types";
-import { STORAGE_KEYS } from "@/constants/constants";
+import { readScores, SCORES_UPDATED_EVENT } from "@/utils/storage-utils";
 
 export function useScores() {
   const [scores, setScores] = useState<ScoreData[]>([]);
@@ -8,13 +8,7 @@ export function useScores() {
 
   const loadScores = useCallback(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEYS.SCORES);
-      if (!raw) {
-        setScores([]);
-        return;
-      }
-      const parsed = JSON.parse(raw);
-      setScores(Array.isArray(parsed) ? parsed : []);
+      setScores(readScores());
     } catch (error) {
       console.error("Error loading scores:", error);
     } finally {
@@ -26,10 +20,10 @@ export function useScores() {
     loadScores();
     const handleScoresUpdate = () => loadScores();
     window.addEventListener("storage", handleScoresUpdate);
-    window.addEventListener("wordly:scores-updated", handleScoresUpdate);
+    window.addEventListener(SCORES_UPDATED_EVENT, handleScoresUpdate);
     return () => {
       window.removeEventListener("storage", handleScoresUpdate);
-      window.removeEventListener("wordly:scores-updated", handleScoresUpdate);
+      window.removeEventListener(SCORES_UPDATED_EVENT, handleScoresUpdate);
     };
   }, [loadScores]);
 
