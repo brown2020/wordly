@@ -2,20 +2,16 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { GAME } from "@/constants/constants";
-import { LetterState, KeyboardState } from "@/types/types";
+import { GAME, STORAGE_KEYS } from "@/constants/constants";
+import { GameMode, LetterState, KeyboardState } from "@/types/types";
 import {
   normalize,
-  getDailyAnswer,
-  getRandomAnswer,
-  getArchiveAnswer,
+  getPuzzleForMode,
   evaluateGuess,
   mergeKeyboardState,
   validateHardMode,
 } from "@/utils/game-utils";
 import { validateWordWithAPI } from "@/utils/dictionary-api";
-
-type GameMode = "daily" | "random" | "archive";
 
 export type InvalidReason = "not_word" | "hard_mode" | "too_short" | null;
 
@@ -73,34 +69,15 @@ export const useGameStore = create<GameStoreState>()(
 
       startNewGame: (mode, archivePuzzleNumber) => {
         const desiredMode = mode ?? get().mode ?? "daily";
-        let answer: string;
-        let id: string;
-        let puzzleNum: number | null = null;
-
-        if (desiredMode === "archive" && archivePuzzleNumber !== undefined) {
-          const result = getArchiveAnswer(archivePuzzleNumber);
-          answer = result.answer;
-          id = result.id;
-          puzzleNum = archivePuzzleNumber;
-        } else if (desiredMode === "daily") {
-          const result = getDailyAnswer();
-          answer = result.answer;
-          id = result.id;
-          // Get puzzle number for daily mode
-          const epoch = Date.UTC(2021, 5, 19);
-          const dayMs = 24 * 60 * 60 * 1000;
-          const today = Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
-          puzzleNum = Math.floor((today - epoch) / dayMs);
-        } else {
-          const result = getRandomAnswer();
-          answer = result.answer;
-          id = result.id;
-        }
+        const { answer, id, puzzleNumber } = getPuzzleForMode(
+          desiredMode,
+          archivePuzzleNumber
+        );
 
         set({
           answer,
           solutionId: id,
-          puzzleNumber: puzzleNum,
+          puzzleNumber,
           mode: desiredMode,
           guesses: [],
           evaluations: [],
@@ -239,7 +216,7 @@ export const useGameStore = create<GameStoreState>()(
         set({ invalidGuess: false, invalidReason: null, invalidMessage: "" }),
     }),
     {
-      name: "wordly-game",
+      name: STORAGE_KEYS.GAME,
       partialize: (state) => ({
         mode: state.mode,
         solutionId: state.solutionId,
