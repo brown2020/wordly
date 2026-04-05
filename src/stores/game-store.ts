@@ -44,6 +44,7 @@ export interface GameStoreState {
   removeLetter: () => void;
   submitGuess: (hardMode?: boolean) => Promise<void>;
   resetInvalid: () => void;
+  score?: number;
 }
 
 export const useGameStore = create<GameStoreState>()(
