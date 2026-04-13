@@ -12,7 +12,6 @@ export function useGameStats() {
     solutionId,
     mode,
     puzzleNumber,
-    score,
   } =
     useGameStore(
       useShallow((s) => ({
@@ -23,7 +22,6 @@ export function useGameStats() {
         solutionId: s.solutionId,
         mode: s.mode,
         puzzleNumber: s.puzzleNumber,
-        score: s.score,
       }))
     );
 
@@ -51,7 +49,6 @@ export function useGameStats() {
     // Persist game history for statistics
     try {
       appendScoreRecord({
-        score,
         attempts: guessesLength,
         word: answer,
         isWin: isWinner,
@@ -91,7 +88,6 @@ export function useGameStats() {
     solutionId,
     mode,
     puzzleNumber,
-    score,
   ]);
 }
 

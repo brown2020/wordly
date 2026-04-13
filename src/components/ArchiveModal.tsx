@@ -123,7 +123,7 @@ export const ArchiveModal: FC<ArchiveModalProps> = ({ isOpen, onClose }) => {
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="px-3 py-1.5 text-sm rounded-md bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+            className="px-3 py-1.5 text-sm rounded-md bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:not-disabled:bg-neutral-200 dark:hover:not-disabled:bg-neutral-600 transition-colors"
           >
             Newer
           </button>
@@ -133,7 +133,7 @@ export const ArchiveModal: FC<ArchiveModalProps> = ({ isOpen, onClose }) => {
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="px-3 py-1.5 text-sm rounded-md bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+            className="px-3 py-1.5 text-sm rounded-md bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:not-disabled:bg-neutral-200 dark:hover:not-disabled:bg-neutral-600 transition-colors"
           >
             Older
           </button>

@@ -34,10 +34,3 @@ export async function validateWordWithAPI(word: string): Promise<boolean> {
     return true;
   }
 }
-
-/**
- * Clear the validation cache (useful for testing)
- */
-export function clearValidationCache(): void {
-  validatedWordsCache.clear();
-}
