@@ -21,9 +21,9 @@ would install a breaking Next.js downgrade.
 
 - Branch: `dev`
 - Upstream: `origin/dev`
-- Commit: pending cleanup commit
-- Pushed to: pending
-- Sync status: local `dev` matched `origin/dev` before cleanup edits
+- Commit: `b4c89db`
+- Pushed to: `origin/dev`
+- Sync status: local `dev` matched `origin/dev` after push/fetch
 
 ## Loop
 
@@ -39,7 +39,7 @@ would install a breaking Next.js downgrade.
 - Current phase: Package and Dead-Code Cleanup
 - Current task: T-005
 - Last pushed commit: `8270181`
-- Next action: commit and push cleanup
+- Next action: review
 - Blockers: none
 
 ## Commands Run
@@ -94,12 +94,12 @@ npm run build
 
 ## Commit-Push Checkpoint
 
-- Status inspected: pending
-- Diff checked: pending
-- Files staged: pending
-- Dry-run push: pending
-- Push: pending
-- Post-push sync: pending
+- Status inspected: clean before commit
+- Diff checked: `git diff --cached --check` passed
+- Files staged: lockfile, constants cleanup, and run reports
+- Dry-run push: passed
+- Push: pushed `b4c89db` to `origin/dev`
+- Post-push sync: local `dev` matched `origin/dev`
 
 ## Stabilization
 
@@ -117,4 +117,4 @@ npm run build
 
 ## Recommended Next Step
 
-Commit and push cleanup, then run review.
+Run review.
