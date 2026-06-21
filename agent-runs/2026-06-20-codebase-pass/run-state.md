@@ -11,22 +11,22 @@
 
 ## Current State
 
-- Phase: Baseline Validation
-- Task: T-002
-- Status: Ready for baseline checkpoint
-- Last command: `npm audit --audit-level=moderate`
-- Last result: failed with dependency vulnerabilities; classified for package cleanup
-- Last pushed commit: 15e8aed
+- Phase: Findings Backlog
+- Task: T-003
+- Status: Ready for findings checkpoint
+- Last command: `npm run lint`
+- Last result: passed
+- Last pushed commit: a339159
 - Branch sync: local `dev` matches `origin/dev`
 - Working tree: only in-scope run reports are dirty
-- Next action: inspect diff, commit, dry-run push, and push baseline report
+- Next action: commit, dry-run push, and push findings report
 
 ## Dirty File Classification
 
 | Path | Classification | Owner/Reason |
 | --- | --- | --- |
-| `agent-runs/2026-06-20-codebase-pass/01-preflight-and-repo-docs.md` | Safe-to-commit | Records pushed preflight checkpoint |
-| `agent-runs/2026-06-20-codebase-pass/02-baseline-validation.md` | Safe-to-commit | Current baseline report |
+| `agent-runs/2026-06-20-codebase-pass/02-baseline-validation.md` | Safe-to-commit | Records pushed baseline checkpoint |
+| `agent-runs/2026-06-20-codebase-pass/03-findings-backlog.md` | Safe-to-commit | Current findings backlog |
 | `agent-runs/2026-06-20-codebase-pass/run-state.md` | Safe-to-commit | Resume ledger update |
 | `agent-runs/2026-06-20-codebase-pass/task-queue.md` | Safe-to-commit | Queue status update |
 
