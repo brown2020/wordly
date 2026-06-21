@@ -23,9 +23,9 @@ workflow run reports, `AGENTS.md`, and `SPEC.md`.
 
 - Branch: `dev`
 - Upstream: `origin/dev`
-- Commit: pending phase commit
-- Pushed to: pending
-- Sync status: local `dev` matched `origin/dev` after fetch/pull
+- Commit: `15e8aed`
+- Pushed to: `origin/dev`
+- Sync status: local `dev` matched `origin/dev` after push/fetch
 
 ## Loop
 
@@ -34,14 +34,14 @@ workflow run reports, `AGENTS.md`, and `SPEC.md`.
 - Verify gate: Git read/dry-run push pass; run folder validates; docs match current evidence; lint passes before push
 - Stop condition: plan, state, queue, docs, report pushed or a real blocker recorded
 - Attempt: 1/1 planning, 1/2 docs
-- Result: passed quality gate; checkpoint pending
+- Result: pushed
 
 ## Run State
 
 - Current phase: Preflight and Repo Docs
 - Current task: T-001
 - Last pushed commit: 624c322
-- Next action: inspect diff, commit, dry-run push, push
+- Next action: baseline validation
 - Blockers: none
 
 ## Commands Run
@@ -103,12 +103,12 @@ npm run lint
 
 ## Commit-Push Checkpoint
 
-- Status inspected: pending
-- Diff checked: pending
-- Files staged: pending
-- Dry-run push: pre-phase proof passed; phase dry-run pending
-- Push: pending
-- Post-push sync: pending
+- Status inspected: clean before commit
+- Diff checked: `git diff --cached --check` passed
+- Files staged: `AGENTS.md`, `SPEC.md`, `agent-runs/2026-06-20-codebase-pass/*`
+- Dry-run push: passed
+- Push: pushed `15e8aed` to `origin/dev`
+- Post-push sync: local `dev` matched `origin/dev`
 
 ## Stabilization
 
@@ -126,4 +126,4 @@ Known risks or uncertainties:
 
 ## Recommended Next Step
 
-Run `npm run lint`, commit and push this docs/report phase, then start baseline validation.
+Start baseline validation.
