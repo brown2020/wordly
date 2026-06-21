@@ -11,24 +11,22 @@
 
 ## Current State
 
-- Phase: Package and Dead-Code Cleanup
-- Task: T-005
-- Status: Ready for cleanup checkpoint
+- Phase: Review
+- Task: Review
+- Status: Ready for review checkpoint
 - Last command: `npm audit --audit-level=moderate`
-- Last result: failed with residual moderate Next/PostCSS advisory; forced breaking fix deferred
-- Last pushed commit: 8270181
+- Last result: failed with deferred moderate Next/PostCSS advisory
+- Last pushed commit: b4c89db
 - Branch sync: local `dev` matches `origin/dev`
-- Working tree: in-scope package/dead-code/run reports are dirty
-- Next action: inspect diff, commit, dry-run push, and push cleanup
+- Working tree: only in-scope run reports are dirty
+- Next action: inspect diff, commit, dry-run push, and push review report
 
 ## Dirty File Classification
 
 | Path | Classification | Owner/Reason |
 | --- | --- | --- |
-| `package-lock.json` | In-scope package | Safe semver-range dependency update |
-| `src/constants/constants.ts` | In-scope source | Remove unused constants with search evidence |
-| `agent-runs/2026-06-20-codebase-pass/04-execute-fixes-and-improvements.md` | Safe-to-commit | Records pushed execution checkpoint |
-| `agent-runs/2026-06-20-codebase-pass/05-package-and-dead-code-cleanup.md` | Safe-to-commit | Current cleanup report |
+| `agent-runs/2026-06-20-codebase-pass/05-package-and-dead-code-cleanup.md` | Safe-to-commit | Records pushed cleanup checkpoint |
+| `agent-runs/2026-06-20-codebase-pass/06-review.md` | Safe-to-commit | Current review report |
 | `agent-runs/2026-06-20-codebase-pass/run-state.md` | Safe-to-commit | Resume ledger update |
 | `agent-runs/2026-06-20-codebase-pass/task-queue.md` | Safe-to-commit | Queue status update |
 
