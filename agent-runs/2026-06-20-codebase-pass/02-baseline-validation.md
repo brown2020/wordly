@@ -19,9 +19,9 @@ build, and npm audit diagnostics. No source files were changed in this phase.
 
 - Branch: `dev`
 - Upstream: `origin/dev`
-- Commit: pending baseline report commit
-- Pushed to: pending
-- Sync status: local `dev` matched `origin/dev` before baseline edits
+- Commit: `a339159`
+- Pushed to: `origin/dev`
+- Sync status: local `dev` matched `origin/dev` after push/fetch
 
 ## Loop
 
@@ -37,7 +37,7 @@ build, and npm audit diagnostics. No source files were changed in this phase.
 - Current phase: Baseline Validation
 - Current task: T-002
 - Last pushed commit: `15e8aed`
-- Next action: commit and push baseline report, then build findings backlog
+- Next action: build findings backlog
 - Blockers: none
 
 ## Commands Run
@@ -88,12 +88,12 @@ npm audit --audit-level=moderate
 
 ## Commit-Push Checkpoint
 
-- Status inspected: pending
-- Diff checked: pending
-- Files staged: pending
-- Dry-run push: pending
-- Push: pending
-- Post-push sync: pending
+- Status inspected: clean before commit
+- Diff checked: `git diff --cached --check` passed
+- Files staged: baseline and run-state report files only
+- Dry-run push: passed
+- Push: pushed `a339159` to `origin/dev`
+- Post-push sync: local `dev` matched `origin/dev`
 
 ## Stabilization
 
@@ -111,4 +111,4 @@ npm audit --audit-level=moderate
 
 ## Recommended Next Step
 
-Commit and push this baseline report, then create the findings backlog.
+Create the findings backlog.
