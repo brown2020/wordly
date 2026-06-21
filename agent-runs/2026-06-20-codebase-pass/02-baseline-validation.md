@@ -2,58 +2,70 @@
 
 ## Agent
 
-Name:
+Name: Codex
 
 ## Scope
 
-What this phase inspected or changed:
+Ran the baseline quality gates defined by the repository: ESLint, production
+build, and npm audit diagnostics. No source files were changed in this phase.
 
 ## Inputs
 
-Reports, files, or commands used:
+- `package.json`
+- `package-lock.json`
+- `agent-runs/2026-06-20-codebase-pass/01-preflight-and-repo-docs.md`
 
 ## Branch and Push
 
-- Branch:
-- Upstream:
-- Commit:
-- Pushed to:
-- Sync status:
+- Branch: `dev`
+- Upstream: `origin/dev`
+- Commit: pending baseline report commit
+- Pushed to: pending
+- Sync status: local `dev` matched `origin/dev` before baseline edits
 
 ## Loop
 
-- Name:
-- Goal:
-- Verify gate:
-- Stop condition:
-- Attempt:
-- Result:
+- Name: Baseline Validation Loop
+- Goal: establish lint/build/package diagnostic baseline
+- Verify gate: passing checks recorded; failures classified with reproduction and owner
+- Stop condition: baseline clean or failures classified with next action
+- Attempt: 1/2
+- Result: lint and build pass; audit vulnerabilities classified for cleanup phase
 
 ## Run State
 
-- Current phase:
-- Current task:
-- Last pushed commit:
-- Next action:
-- Blockers:
+- Current phase: Baseline Validation
+- Current task: T-002
+- Last pushed commit: `15e8aed`
+- Next action: commit and push baseline report, then build findings backlog
+- Blockers: none
 
 ## Commands Run
 
 ```text
-None.
+npm run lint
+npm run build
+npm audit --audit-level=moderate
 ```
 
 ## Findings
 
-- None.
+- `npm run lint` passed.
+- `npm run build` passed with static routes for `/`, `/_not-found`, `/scores`, and `/scores/(..)scores`.
+- `npm audit --audit-level=moderate` failed with 4 vulnerabilities reported through dependency paths including `next`, `@babel/core`, `brace-expansion`, and `postcss`.
 
 ## Changes Made
 
-- None.
+- Updated baseline validation report.
+- Queued dependency cleanup follow-up in `task-queue.md`.
 
 ## Verification
 
-Checks performed and results:
+| Command | Result | Classification | Notes |
+| --- | --- | --- | --- |
+| `npm run lint` | Pass | Clean baseline | ESLint completed with no findings. |
+| `npm run build` | Pass | Clean baseline | Next.js production build completed successfully. |
+| `npm audit --audit-level=moderate` | Fail | Dependency baseline issue | Vulnerabilities are pre-existing relative to this phase and queued for package cleanup. |
 
 ## Architecture and Lean Code Scorecard
 
@@ -70,18 +82,18 @@ Checks performed and results:
 
 ## Quality Gate
 
-- Command:
-- Result:
-- Notes:
+- Command: `npm run lint`
+- Result: passed
+- Notes: lint is clean and sufficient to push this report-only baseline phase while audit findings are queued separately
 
 ## Commit-Push Checkpoint
 
-- Status inspected:
-- Diff checked:
-- Files staged:
-- Dry-run push:
-- Push:
-- Post-push sync:
+- Status inspected: pending
+- Diff checked: pending
+- Files staged: pending
+- Dry-run push: pending
+- Push: pending
+- Post-push sync: pending
 
 ## Stabilization
 
@@ -91,7 +103,7 @@ Checks performed and results:
 
 ## Risks
 
-Known risks or uncertainties:
+- Audit reported vulnerable dependency paths. Package cleanup will try safe fixes and defer any risky major migration.
 
 ## Open Questions
 
@@ -99,4 +111,4 @@ Known risks or uncertainties:
 
 ## Recommended Next Step
 
-What should happen next:
+Commit and push this baseline report, then create the findings backlog.
