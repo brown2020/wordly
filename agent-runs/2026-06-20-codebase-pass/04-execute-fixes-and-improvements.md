@@ -20,9 +20,9 @@ arbitrary words. The fallback now checks the local valid-word list.
 
 - Branch: `dev`
 - Upstream: `origin/dev`
-- Commit: pending execution commit
-- Pushed to: pending
-- Sync status: local `dev` matched `origin/dev` before edits
+- Commit: `8270181`
+- Pushed to: `origin/dev`
+- Sync status: local `dev` matched `origin/dev` after push/fetch
 
 ## Loop
 
@@ -38,7 +38,7 @@ arbitrary words. The fallback now checks the local valid-word list.
 - Current phase: Execute Fixes and Improvements
 - Current task: T-004
 - Last pushed commit: `9568506`
-- Next action: commit and push execution fix
+- Next action: package and dead-code cleanup
 - Blockers: none
 
 ## Commands Run
@@ -85,12 +85,12 @@ npm run build
 
 ## Commit-Push Checkpoint
 
-- Status inspected: pending
-- Diff checked: pending
-- Files staged: pending
-- Dry-run push: pending
-- Push: pending
-- Post-push sync: pending
+- Status inspected: clean before commit
+- Diff checked: `git diff --cached --check` passed
+- Files staged: dictionary fix, spec, and run reports
+- Dry-run push: passed
+- Push: pushed `8270181` to `origin/dev`
+- Post-push sync: local `dev` matched `origin/dev`
 
 ## Stabilization
 
@@ -108,4 +108,4 @@ npm run build
 
 ## Recommended Next Step
 
-Commit and push the dictionary fallback fix, then run package/dead-code cleanup.
+Run package/dead-code cleanup.
