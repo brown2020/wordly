@@ -11,24 +11,24 @@
 
 ## Current State
 
-- Phase: Execute Fixes and Improvements
-- Task: T-004
-- Status: Ready for execution checkpoint
-- Last command: `npm run build`
-- Last result: passed
-- Last pushed commit: 9568506
+- Phase: Package and Dead-Code Cleanup
+- Task: T-005
+- Status: Ready for cleanup checkpoint
+- Last command: `npm audit --audit-level=moderate`
+- Last result: failed with residual moderate Next/PostCSS advisory; forced breaking fix deferred
+- Last pushed commit: 8270181
 - Branch sync: local `dev` matches `origin/dev`
-- Working tree: in-scope source/docs/run reports are dirty
-- Next action: inspect diff, commit, dry-run push, and push execution fix
+- Working tree: in-scope package/dead-code/run reports are dirty
+- Next action: inspect diff, commit, dry-run push, and push cleanup
 
 ## Dirty File Classification
 
 | Path | Classification | Owner/Reason |
 | --- | --- | --- |
-| `src/utils/dictionary-api.ts` | In-scope source | T-004 dictionary fallback fix |
-| `SPEC.md` | Safe-to-commit | Current-state validation docs update |
-| `agent-runs/2026-06-20-codebase-pass/03-findings-backlog.md` | Safe-to-commit | Records pushed findings checkpoint |
-| `agent-runs/2026-06-20-codebase-pass/04-execute-fixes-and-improvements.md` | Safe-to-commit | Current execution report |
+| `package-lock.json` | In-scope package | Safe semver-range dependency update |
+| `src/constants/constants.ts` | In-scope source | Remove unused constants with search evidence |
+| `agent-runs/2026-06-20-codebase-pass/04-execute-fixes-and-improvements.md` | Safe-to-commit | Records pushed execution checkpoint |
+| `agent-runs/2026-06-20-codebase-pass/05-package-and-dead-code-cleanup.md` | Safe-to-commit | Current cleanup report |
 | `agent-runs/2026-06-20-codebase-pass/run-state.md` | Safe-to-commit | Resume ledger update |
 | `agent-runs/2026-06-20-codebase-pass/task-queue.md` | Safe-to-commit | Queue status update |
 

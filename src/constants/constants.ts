@@ -11,7 +11,6 @@ export const STORAGE_KEYS = {
 export const GAME = {
   WORD_LENGTH: 5,
   MAX_ATTEMPTS: 6,
-  POINTS_PER_ATTEMPT: 10,
   REVEAL_TIME_MS: 350,
 } as const;
 
@@ -61,12 +60,4 @@ export const BUTTON = {
     "px-6 py-3 bg-white text-neutral-700 border-2 border-neutral-200 rounded-xl hover:border-neutral-300 hover:bg-neutral-50 focus:outline-none focus:ring-4 focus:ring-neutral-200 transition-all duration-200 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5 font-medium",
   accent:
     "px-6 py-3 bg-gradient-to-r from-accent-purple to-accent-pink text-white rounded-xl hover:from-accent-purple/90 hover:to-accent-pink/90 focus:outline-none focus:ring-4 focus:ring-accent-purple/30 transition-all duration-200 shadow-medium hover:shadow-strong transform hover:-translate-y-0.5 font-medium",
-} as const;
-
-// Refined game messages
-export const MESSAGES = {
-  win: "🎉 Congratulations! You won!",
-  lose: "Better luck next time! 🎯",
-  invalidWord: "Not a valid word 🤔",
-  tooShort: "Word must be 5 letters ✏️",
 } as const;
