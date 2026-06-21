@@ -25,8 +25,9 @@ daily, random, or archived puzzles.
   `src/utils/storage-utils.ts`.
 - Puzzle selection, duplicate-letter evaluation, hard-mode checks, puzzle
   numbers, and share text live in `src/utils/game-utils.ts`.
-- Word validation currently calls the free dictionary API from
-  `src/utils/dictionary-api.ts`.
+- Word validation calls the free dictionary API from
+  `src/utils/dictionary-api.ts` and falls back to the local valid-word list in
+  `src/constants/valid-words.ts` when the API is unavailable.
 
 ## Validation
 
@@ -51,8 +52,8 @@ daily, random, or archived puzzles.
 
 - The lack of automated tests leaves core word-evaluation and persistence
   behavior under-protected.
-- External dictionary validation must fail safely without accepting arbitrary
-  invalid guesses.
+- External dictionary validation must continue to fail safely without accepting
+  arbitrary invalid guesses.
 - The public README and assistant guidance can drift from the actual component
   tree and package versions.
 - Archive, daily, and score persistence all write to localStorage and should

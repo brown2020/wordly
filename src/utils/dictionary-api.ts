@@ -1,4 +1,6 @@
 // Dictionary API service for word validation
+import { isValidWord } from "@/constants/valid-words";
+
 const DICTIONARY_API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en";
 
 // Cache validated words to avoid repeated API calls
@@ -28,9 +30,11 @@ export async function validateWordWithAPI(word: string): Promise<boolean> {
     validatedWordsCache.set(normalizedWord, isValid);
     return isValid;
   } catch {
-    // Network error or timeout - don't cache, return true to allow the word
-    // This prevents blocking gameplay when offline
-    console.warn("Dictionary API unavailable, allowing word:", normalizedWord);
-    return true;
+    const localFallback = isValidWord(normalizedWord);
+    console.warn(
+      "Dictionary API unavailable, falling back to local word list:",
+      normalizedWord
+    );
+    return localFallback;
   }
 }

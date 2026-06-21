@@ -2,58 +2,67 @@
 
 ## Agent
 
-Name:
+Name: Codex
 
 ## Scope
 
-What this phase inspected or changed:
+Fixed F-001/T-004: dictionary API network/timeout failures no longer allow
+arbitrary words. The fallback now checks the local valid-word list.
 
 ## Inputs
 
-Reports, files, or commands used:
+- `src/utils/dictionary-api.ts`
+- `src/constants/valid-words.ts`
+- `SPEC.md`
+- `agent-runs/2026-06-20-codebase-pass/03-findings-backlog.md`
 
 ## Branch and Push
 
-- Branch:
-- Upstream:
-- Commit:
-- Pushed to:
-- Sync status:
+- Branch: `dev`
+- Upstream: `origin/dev`
+- Commit: pending execution commit
+- Pushed to: pending
+- Sync status: local `dev` matched `origin/dev` before edits
 
 ## Loop
 
-- Name:
-- Goal:
-- Verify gate:
-- Stop condition:
-- Attempt:
-- Result:
+- Name: Task Queue Loop, Fix Validation Loop
+- Goal: fix confirmed validation bug without broad churn
+- Verify gate: fallback uses local validation; lint and build pass
+- Stop condition: T-004 done and pushed or blocked by verification failure
+- Attempt: 1/3
+- Result: fix implemented; lint/build passed
 
 ## Run State
 
-- Current phase:
-- Current task:
-- Last pushed commit:
-- Next action:
-- Blockers:
+- Current phase: Execute Fixes and Improvements
+- Current task: T-004
+- Last pushed commit: `9568506`
+- Next action: commit and push execution fix
+- Blockers: none
 
 ## Commands Run
 
 ```text
-None.
+npm run lint
+npm run build
 ```
 
 ## Findings
 
-- None.
+- F-001 confirmed: `validateWordWithAPI` returned `true` on catch, so API outage/timeout accepted arbitrary guesses.
 
 ## Changes Made
 
-- None.
+- Imported `isValidWord` into `src/utils/dictionary-api.ts`.
+- Changed the catch path to return `isValidWord(normalizedWord)` instead of `true`.
+- Updated `SPEC.md` to document the local fallback behavior.
 
 ## Verification
 
-Checks performed and results:
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- Source inspection confirms the catch path uses the local valid-word list.
 
 ## Architecture and Lean Code Scorecard
 
@@ -63,25 +72,25 @@ Checks performed and results:
 | Module cohesion | Not assessed | N/A | Assess if relevant |
 | Public surface area | Not assessed | N/A | Assess if relevant |
 | Data and side-effect flow | Not assessed | N/A | Assess if relevant |
-| Async/cache/resource lifecycle | Not assessed | N/A | Assess if relevant |
+| Async/cache/resource lifecycle | Pass | API catch path now falls back to deterministic local validation. | Fixed F-001 |
 | Duplication and dead code | Not assessed | N/A | Assess if relevant |
-| Dependency lean-ness | Not assessed | N/A | Assess if relevant |
+| Dependency lean-ness | Fail | Audit findings remain for package cleanup. | Run T-005 |
 | Testability | Not assessed | N/A | Assess if relevant |
 
 ## Quality Gate
 
-- Command:
-- Result:
-- Notes:
+- Command: `npm run lint`
+- Result: passed
+- Notes: build also passed as targeted verification for the source change
 
 ## Commit-Push Checkpoint
 
-- Status inspected:
-- Diff checked:
-- Files staged:
-- Dry-run push:
-- Push:
-- Post-push sync:
+- Status inspected: pending
+- Diff checked: pending
+- Files staged: pending
+- Dry-run push: pending
+- Push: pending
+- Post-push sync: pending
 
 ## Stabilization
 
@@ -91,7 +100,7 @@ Checks performed and results:
 
 ## Risks
 
-Known risks or uncertainties:
+- No automated unit test runner exists yet, so validation is lint/build plus source inspection.
 
 ## Open Questions
 
@@ -99,4 +108,4 @@ Known risks or uncertainties:
 
 ## Recommended Next Step
 
-What should happen next:
+Commit and push the dictionary fallback fix, then run package/dead-code cleanup.
