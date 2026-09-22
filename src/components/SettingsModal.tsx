@@ -66,6 +66,7 @@ export const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose }) => {
             enabled={hardMode}
             onToggle={toggleHardMode}
             disabled={gameInProgress && !hardMode}
+            label="Hard Mode"
           />
         </SettingRow>
         {gameInProgress && !hardMode && (
@@ -78,7 +79,7 @@ export const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
         {/* Dark Theme */}
         <SettingRow title="Dark Theme" description="Toggle dark mode appearance">
-          <ToggleSwitch enabled={darkMode} onToggle={toggleDarkMode} />
+          <ToggleSwitch enabled={darkMode} onToggle={toggleDarkMode} label="Dark Theme" />
         </SettingRow>
 
         <hr className="border-neutral-200 dark:border-neutral-700" />
@@ -91,6 +92,7 @@ export const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose }) => {
           <ToggleSwitch
             enabled={highContrastMode}
             onToggle={toggleHighContrastMode}
+            label="High Contrast Mode"
           />
         </SettingRow>
       </div>
@@ -120,14 +122,17 @@ interface ToggleSwitchProps {
   enabled: boolean;
   onToggle: () => void;
   disabled?: boolean;
+  label: string;
 }
 
 const ToggleSwitch: FC<ToggleSwitchProps> = ({
   enabled,
   onToggle,
   disabled = false,
+  label,
 }) => (
   <button
+    type="button"
     onClick={onToggle}
     disabled={disabled}
     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -139,6 +144,7 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
     }`}
     role="switch"
     aria-checked={enabled}
+    aria-label={label}
   >
     <span
       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

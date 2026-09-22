@@ -31,11 +31,14 @@ daily, random, or archived puzzles.
 
 ## Validation
 
-- `npm run lint` is the primary static quality gate.
-- `npm run build` is the primary integration/build gate.
-- No dedicated automated test script is currently configured.
-- Manual validation should cover daily, random, and archive modes; hard mode;
-  dark mode; high-contrast mode; sharing; score history; and mobile layout.
+- `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` are the
+  primary quality gates (also wired in GitHub Actions on `dev`/`main`).
+- Unit tests cover guess evaluation, hard-mode rules, share text, and the
+  absence of API route handlers / server actions.
+- Manual or Playwright validation should cover daily, random, and archive modes;
+  hard mode; dark mode; high-contrast mode; sharing; score history; and mobile layout.
+- CI must never inline `NEXT_PUBLIC_*` / API keys — use `${{ secrets.* }}` only
+  if client env is added later; gate jobs tolerate missing secrets.
 
 ## Architecture Boundaries
 
@@ -50,8 +53,7 @@ daily, random, or archived puzzles.
 
 ## Quality Risks
 
-- The lack of automated tests leaves core word-evaluation and persistence
-  behavior under-protected.
+- Persistence and full browser flows remain thinner than unit-covered evaluation.
 - External dictionary validation must continue to fail safely without accepting
   arbitrary invalid guesses.
 - The public README and assistant guidance can drift from the actual component

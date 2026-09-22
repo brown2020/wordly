@@ -65,10 +65,15 @@ export const GameBoard: FC = () => {
   const highContrastMode = useSettingsStore((s) => s.highContrastMode);
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div
+      className="flex flex-col gap-1.5"
+      role="group"
+      aria-label="Wordly game board"
+      data-testid="wordly-board"
+    >
       {[...Array(GAME.MAX_ATTEMPTS)].map((_, rowIndex) => (
         <GameRow
-          key={rowIndex}
+          key={`row-${rowIndex}`}
           rowIndex={rowIndex}
           highContrastMode={highContrastMode}
         />

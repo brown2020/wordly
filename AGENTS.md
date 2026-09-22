@@ -10,11 +10,14 @@ CSS, and Zustand. The primary UI is `src/app/page.tsx`, which renders
 
 - `npm run dev`: start the local Next.js dev server.
 - `npm run lint`: run ESLint across the repository.
+- `npm run typecheck`: TypeScript `tsc --noEmit`.
+- `npm test`: unit tests (game-utils + route security).
 - `npm run build`: create the production build.
 - `npm run start`: serve a production build.
+- `npm run doctor`: React Doctor scan.
 
-Before committing source changes, run `npm run lint` and `npm run build` when
-practical. There is no dedicated test script in `package.json` at this time.
+Before committing source changes, run `npm run lint`, `npm run typecheck`,
+`npm test`, and `npm run build` when practical.
 
 ## Architecture Notes
 
@@ -45,8 +48,8 @@ practical. There is no dedicated test script in `package.json` at this time.
 
 ## Current Risks
 
-- The app has no automated test suite; validation currently depends on lint,
-  production build, and manual browser workflows.
+- Unit tests cover evaluation/hard-mode/share and assert no API routes;
+  browser UX still needs a manual or Playwright pass for full confidence.
 - Word validation depends on an external dictionary API and must retain a safe
   local fallback path.
 - Local storage records include legacy-compatible fields, so migrations should

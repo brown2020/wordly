@@ -7,7 +7,7 @@ interface CountdownTimerProps {
 }
 
 export const CountdownTimer: FC<CountdownTimerProps> = ({ className = "" }) => {
-  const [timeLeft, setTimeLeft] = useState(getTimeUntilMidnight());
+  const [timeLeft, setTimeLeft] = useState(() => getTimeUntilMidnight());
 
   useEffect(() => {
     const interval = setInterval(() => {

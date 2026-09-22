@@ -69,7 +69,7 @@ export default function OnscreenKeyboard() {
       <div className="flex flex-col gap-1.5">
         {ROWS.map((row, i) => (
           <div
-            key={i}
+            key={row.join("-")}
             className={[
               "flex w-full justify-center gap-1.5",
               i === 1 ? "px-[clamp(0.35rem,1.2vw,0.75rem)]" : "",
