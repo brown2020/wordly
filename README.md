@@ -100,4 +100,4 @@ Hosted on Vercel at [wordlyapp.vercel.app](https://wordlyapp.vercel.app). Client
 
 ## License
 
-No `LICENSE` file is present in this repository.
+[GNU Affero General Public License v3.0](LICENSE.md) (AGPL-3.0).
