@@ -17,24 +17,30 @@ daily, random, or archived puzzles.
 - Keyboard input comes from both a browser keydown listener in
   `src/hooks/useGameController.ts` and the client-only onscreen keyboard in
   `src/components/keyboard/OnscreenKeyboard.tsx`.
-- Game state and actions live in `src/stores/game-store.ts`, with persisted
-  mode, solution id, and puzzle number.
+- Game state and actions live in `src/stores/game-store.ts`. The active board,
+  mode, solution id, puzzle number, and score-recorded flag are persisted.
 - User settings live in `src/stores/settings-store.ts` and include hard mode,
   dark mode, and high-contrast mode.
 - Score history and archive progress are stored in localStorage through
   `src/utils/storage-utils.ts`.
 - Puzzle selection, duplicate-letter evaluation, hard-mode checks, puzzle
   numbers, and share text live in `src/utils/game-utils.ts`.
-- Word validation calls the free dictionary API from
-  `src/utils/dictionary-api.ts` and falls back to the local valid-word list in
-  `src/constants/valid-words.ts` when the API is unavailable.
+- Hard mode applies every previous evaluation. Green letters stay fixed, and
+  the guess must include the largest revealed count of each letter.
+- Word validation accepts the local valid-word list immediately. Unknown words
+  are accepted only when the dictionary API returns success. HTTP 404 is cached
+  as a miss. Other HTTP statuses and network errors are not cached and do not
+  accept the guess.
+- The active board is persisted with its score-recorded flag. Daily and archive
+  puzzles are written to history once per puzzle number.
+- Dark mode is the `html.dark` class. Remote image patterns are not configured.
 
 ## Validation
 
 - `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` are the
   primary quality gates (also wired in GitHub Actions on `dev`/`main`).
-- Unit tests cover guess evaluation, hard-mode rules, share text, and the
-  absence of API route handlers / server actions.
+- Unit tests cover guess evaluation, hard-mode rules, share text, dictionary
+  fallback, score sanitizing, and the absence of API route handlers / server actions.
 - Manual or Playwright validation should cover daily, random, and archive modes;
   hard mode; dark mode; high-contrast mode; sharing; score history; and mobile layout.
 - CI must never inline `NEXT_PUBLIC_*` / API keys — use `${{ secrets.* }}` only
@@ -55,7 +61,7 @@ daily, random, or archived puzzles.
 
 - Persistence and full browser flows remain thinner than unit-covered evaluation.
 - External dictionary validation must continue to fail safely without accepting
-  arbitrary invalid guesses.
+  arbitrary invalid guesses. API errors fail closed for words outside the local list.
 - The public README and assistant guidance can drift from the actual component
   tree and package versions.
 - Archive, daily, and score persistence all write to localStorage and should

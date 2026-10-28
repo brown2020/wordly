@@ -16,13 +16,13 @@ Browser
 
 | Path | Fact | Writer | Cache / durability |
 | --- | --- | --- | --- |
-| start_new_game | answer, guesses, mode, puzzleNumber | `useGameStore.startNewGame` | zustand persist (mode/solutionId/puzzleNumber) |
-| submit_guess | guesses, evaluations, keyboard, win/lose | `useGameStore.submitGuess` | in-memory + persist partial |
+| start_new_game | answer, guesses, mode, puzzleNumber | `useGameStore.startNewGame` | zustand persist (board + score flag) |
+| submit_guess | guesses, evaluations, keyboard, win/lose | `useGameStore.submitGuess` | persisted after the solution id is still current |
 | toggle_settings | hard/dark/highContrast | `useSettingsStore` toggles | localStorage via persist |
 | persist_scores | score history | `useScores` / storage-utils | localStorage only |
 | archive_progress | completed puzzles | `useArchiveProgress` | localStorage only |
 
-No server cache. Reload restores persisted game meta + settings + scores; live board comes from store hydrate.
+No server cache. Reload restores the persisted board, mode, score-recorded flag, settings, and scores. A new game starts only when no answer was restored.
 
 ## Server / client
 
