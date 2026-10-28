@@ -1,49 +1,53 @@
 # Wordly
 
-A browser Wordle-style game: guess a five-letter word in six tries with color feedback. Play the shared **daily** puzzle, unlimited **random** practice, or catch up via the **archive**. Stats, settings, and progress persist in `localStorage`.
+A browser Wordle-style game: guess a five-letter word in six tries with color feedback. Play the shared **daily** puzzle, unlimited **random** practice, or past puzzles from the **archive**. Stats, settings, and the active board persist in `localStorage`.
 
 **Live demo:** [https://wordlyapp.vercel.app](https://wordlyapp.vercel.app)
 
 ## Features
 
-- **Daily / random / archive modes** — same daily solution for everyone; practice mode; archive picker for past puzzles
-- **Six guesses, five letters** — green / yellow / gray evaluation with duplicate-letter handling
-- **Hard mode** — revealed hints must be reused on later guesses
-- **On-screen + physical keyboard** — color-coded keys; invalid-guess shake + toast messaging
-- **Word validation** — bundled valid words are accepted locally. Unknown words need a successful Free Dictionary API response; HTTP 404 is a miss, and other errors are not cached
-- **Stats & scores** — games played, win %, streaks, guess distribution; score history route `/scores`
-- **Share** — copy emoji grid results
-- **Settings** — hard mode, dark mode, high-contrast mode
-- **Countdown** — timer to the next daily puzzle after win/lose
+- **Daily / random / archive** — one UTC daily solution for everyone; unlimited practice; archive picker for past puzzle numbers
+- **Six guesses, five letters** — green / yellow / gray evaluation, including duplicate letters
+- **Hard mode** — greens stay fixed across every earlier guess, and the guess must include the largest revealed count of each letter. Hard mode can be turned on only before the first guess
+- **On-screen and physical keyboard** — color-coded keys. Physical keys are ignored while a modal is open
+- **Word validation** — the bundled valid-word list is accepted locally. Unknown five-letter words need a successful Free Dictionary API response. HTTP 404 is cached as a miss. Other HTTP errors and network failures are not cached and do not accept the guess
+- **Stats and scores** — games played, win %, current and max streak, guess distribution, and a `/scores` history page. A loss today breaks the current streak. Each daily or archive puzzle is recorded once
+- **Share** — copy an emoji grid. Hard mode adds `*`. High contrast uses the orange/blue squares
+- **Settings** — hard mode, dark mode (`html.dark`, not the OS color scheme), high-contrast tiles
+- **Countdown** — time until the next UTC daily puzzle after a daily win or loss
 
-No accounts, Firebase, Stripe, or custom env vars required.
+No accounts, Firebase, Stripe, or environment variables.
 
 ## Tech stack
 
 | Layer | Choice |
 | --- | --- |
-| Framework | Next.js `^16.3.6` (App Router) |
-| UI | React `^19.3.0`, Tailwind CSS `^4.3.3` |
-| Language | TypeScript `^6` |
-| State | Zustand `^5` |
-| Dates | date-fns `^4` |
-| Tests | Node.js test runner via `tsx` |
-| Lint | ESLint `^10` + TypeScript ESLint |
+| Framework | Next.js `^16.4.3` (App Router) |
+| UI | React `^19.3.1`, Tailwind CSS `^4.3.3` |
+| Language | TypeScript `^6.0.3` |
+| State | Zustand `^5.0.16` |
+| Dates | date-fns `^4.4.0` |
+| Tests | Node.js test runner via `tsx` `^4.23.15` |
+| Lint | ESLint `^10.13.0` and typescript-eslint `^8.72.1` |
 
 ## Project structure
 
 ```
 src/
-  app/                 # /, /scores (with intercepting route), error/loading/not-found
+  app/                 # /, /scores, error, loading, not-found
   components/          # WordlyMain, board, tiles, modals, keyboard, ui
   stores/              # game-store, settings-store
   hooks/               # game controller, stats, scores, archive progress
   utils/               # evaluation, hard mode, share text, storage, dictionary API
-  constants/           # game config, wordlist, valid-words
+  constants/           # game config, 143 solutions, 1732 valid guesses
   types/
-docs/                  # architecture / budget notes
+docs/                  # architecture and budget notes
+SPEC.md                # current behavior
+roadmap.md             # next steps and known gaps
 .github/workflows/ci.yml
 ```
+
+Theme tokens and the dark-mode variant live in `src/app/globals.css`.
 
 ## Getting started
 
@@ -62,7 +66,7 @@ npm install
 
 ### Environment variables
 
-None required. Guess validation optionally calls the public Free Dictionary API; if it fails, the local word list is used.
+None. The app does not read environment variables. Unknown guesses may call the public Free Dictionary API; if that call fails, the guess is rejected unless it is already in the local word list.
 
 ### Run locally
 
@@ -78,7 +82,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | --- | --- |
 | `npm run dev` | Development server |
 | `npm run build` | Production build |
-| `npm start` | Serve production build |
+| `npm start` | Serve the production build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm test` | Node tests under `src/**/*.test.ts` |
@@ -86,17 +90,17 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Testing and CI
 
-CI on `dev` / `main` and PRs: install → lint → typecheck → test → build. No secrets. Tests cover guess evaluation, hard-mode rules, share text, and route invariants (no privileged API surface).
+CI on `dev`, `main`, and pull requests runs install, lint, typecheck, test, and build. No secrets. Tests cover guess evaluation, hard mode, share text, dictionary fallback, score rows, archive restart, and the absence of API routes.
 
 ## Deployment
 
-Hosted on Vercel at [wordlyapp.vercel.app](https://wordlyapp.vercel.app). Client-only persistence; no host secrets required for a basic deploy.
+Hosted on Vercel at [wordlyapp.vercel.app](https://wordlyapp.vercel.app). Persistence is in the browser. A basic deploy does not need host environment variables.
 
 ## Contributing
 
 1. Work on `dev`.
-2. Run `npm run lint`, `npm run typecheck`, and `npm test` before pushing.
-3. Keep evaluation logic in `src/utils/game-utils.ts` covered when changing guess rules.
+2. Run `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` before pushing.
+3. Keep guess rules in `src/utils/game-utils.ts` covered when they change.
 
 ## License
 

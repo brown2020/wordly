@@ -28,6 +28,39 @@ describe("game store transitions", () => {
     assert.equal(useGameStore.getState().puzzleNumber, null);
   });
 
+  it("types letters and submits the answer", async () => {
+    useGameStore.getState().startNewGame("daily");
+    const answer = useGameStore.getState().answer;
+    const { handleKey, submitGuess } = useGameStore.getState();
+
+    for (const letter of answer) {
+      handleKey(letter, false);
+    }
+    assert.equal(useGameStore.getState().currentGuess, answer);
+
+    await submitGuess(false);
+    const finished = useGameStore.getState();
+    assert.equal(finished.isWinner, true);
+    assert.equal(finished.isGameOver, true);
+    assert.deepEqual(finished.guesses, [answer]);
+    assert.deepEqual(finished.evaluations[0], [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+    ]);
+    assert.equal(finished.resultRecorded, false);
+  });
+
+  it("rejects a short guess before calling the dictionary", async () => {
+    useGameStore.getState().startNewGame("daily");
+    useGameStore.setState({ currentGuess: "cat" });
+    await useGameStore.getState().submitGuess(false);
+    assert.equal(useGameStore.getState().invalidReason, "too_short");
+    assert.deepEqual(useGameStore.getState().guesses, []);
+  });
+
   it("drops a guess that finishes after a new game has started", async () => {
     useGameStore.getState().startNewGame("daily");
     useGameStore.setState({ currentGuess: "crane" });
