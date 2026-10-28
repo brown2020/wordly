@@ -10,7 +10,7 @@ A browser Wordle-style game: guess a five-letter word in six tries with color fe
 - **Six guesses, five letters** — green / yellow / gray evaluation with duplicate-letter handling
 - **Hard mode** — revealed hints must be reused on later guesses
 - **On-screen + physical keyboard** — color-coded keys; invalid-guess shake + toast messaging
-- **Word validation** — Free Dictionary API (`api.dictionaryapi.dev`) with local `valid-words` fallback and short timeout
+- **Word validation** — bundled valid words are accepted locally. Unknown words need a successful Free Dictionary API response; HTTP 404 is a miss, and other errors are not cached
 - **Stats & scores** — games played, win %, streaks, guess distribution; score history route `/scores`
 - **Share** — copy emoji grid results
 - **Settings** — hard mode, dark mode, high-contrast mode
