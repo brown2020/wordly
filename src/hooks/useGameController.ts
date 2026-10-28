@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
-import { useSettingsStore } from "@/stores/settings-store";
 import { useGameStats } from "./useGameStats";
 import { useShallow } from "zustand/shallow";
 
@@ -20,18 +19,24 @@ export function useGameController() {
   // Handle stats persistence
   useGameStats();
 
-  // Handle keyboard input
+  // Restore a persisted game before starting a new one. Hydration is async.
   useEffect(() => {
-    // Ensure a game is initialized (use persisted mode when available)
-    if (!useGameStore.getState().answer) {
-      useGameStore.getState().startNewGame();
-    }
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const hardMode = useSettingsStore.getState().hardMode;
-      useGameStore.getState().handleKey(event.key, hardMode);
+    let cancelled = false;
+    const startIfNeeded = () => {
+      if (cancelled) return;
+      if (!useGameStore.getState().answer) {
+        useGameStore.getState().startNewGame();
+      }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    const unsub = useGameStore.persist.onFinishHydration(startIfNeeded);
+    if (useGameStore.persist.hasHydrated()) {
+      startIfNeeded();
+    }
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, []);
 
   // Handle game over modal

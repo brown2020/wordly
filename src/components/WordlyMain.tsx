@@ -46,6 +46,19 @@ export default function WordlyMain() {
     }
   }, [darkMode]);
 
+  const modalOpen =
+    showModal || showStats || showSettings || showHelp || showArchive;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (modalOpen) return;
+      const hardMode = useSettingsStore.getState().hardMode;
+      useGameStore.getState().handleKey(event.key, hardMode);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [modalOpen]);
+
   // Show help on first visit
   useEffect(() => {
     const hasSeenHelp = localStorage.getItem("wordly-seen-help");

@@ -1,5 +1,6 @@
 import { ScoreData } from "@/types/types";
 import { GAME } from "@/constants/constants";
+import { isScoreRecord } from "@/utils/storage-utils";
 
 export type GameStats = {
   totalGames: number;
@@ -12,15 +13,16 @@ export type GameStats = {
 };
 
 export function calculateStats(scores: ScoreData[]): GameStats {
-  const totalGames: number = scores.length;
+  const safeScores = scores.filter(isScoreRecord);
+  const totalGames: number = safeScores.length;
   const isWin = (s: ScoreData) =>
     s.isWin ?? (s.attempts >= 1 && s.attempts <= GAME.MAX_ATTEMPTS);
 
-  const wins: number = scores.filter(isWin).length;
+  const wins: number = safeScores.filter(isWin).length;
 
   // Streaks: compute by consecutive days with wins
   const byDay = new Map<string, boolean>();
-  for (const s of scores) {
+  for (const s of safeScores) {
     const day = new Date(s.date).toISOString().slice(0, 10);
     byDay.set(day, (byDay.get(day) ?? false) || isWin(s));
   }
@@ -48,14 +50,19 @@ export function calculateStats(scores: ScoreData[]): GameStats {
     maxStreak = Math.max(maxStreak, currentStreak);
   }
 
-  // Current streak must end on today or yesterday
+  // A loss today breaks the streak. Otherwise it ends on today or yesterday.
   const today = new Date();
   const todayStr = today.toISOString().slice(0, 10);
   const yesterdayStr = new Date(today.getTime() - 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
-  const anchor =
-    byDay.get(todayStr) ? todayStr : byDay.get(yesterdayStr) ? yesterdayStr : null;
+  const playedToday = byDay.has(todayStr);
+  const wonToday = byDay.get(todayStr) === true;
+  const anchor = wonToday
+    ? todayStr
+    : !playedToday && byDay.get(yesterdayStr)
+      ? yesterdayStr
+      : null;
   if (anchor) {
     let streak = 1;
     let cursor = anchor;
@@ -80,7 +87,7 @@ export function calculateStats(scores: ScoreData[]): GameStats {
 
   const guessDistribution: Record<number, number> = {};
   for (let i = 1; i <= GAME.MAX_ATTEMPTS; i++) guessDistribution[i] = 0;
-  for (const s of scores) {
+  for (const s of safeScores) {
     if (isWin(s) && s.attempts >= 1 && s.attempts <= GAME.MAX_ATTEMPTS) {
       guessDistribution[s.attempts]++;
     }

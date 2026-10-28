@@ -10,6 +10,7 @@ import {
   evaluateGuess,
   mergeKeyboardState,
   validateHardMode,
+  resolveStartedGame,
 } from "@/utils/game-utils";
 import { validateWordWithAPI } from "@/utils/dictionary-api";
 
@@ -36,6 +37,8 @@ export interface GameStoreState {
   puzzleNumber: number | null; // puzzle number for daily/archive modes
   keyboard: KeyboardState; // letter -> best-known state
   gameInProgress: boolean; // whether a game has been started (for hard mode lock)
+  resultRecorded: boolean; // completion already written to score history
+  gameEpoch: number; // increments on each new game so in-flight submits can bail
 
   // Actions
   startNewGame: (mode?: GameMode, puzzleNumber?: number) => void;
@@ -66,19 +69,27 @@ export const useGameStore = create<GameStoreState>()(
       puzzleNumber: null,
       keyboard: {},
       gameInProgress: false,
+      resultRecorded: false,
+      gameEpoch: 0,
 
       startNewGame: (mode, archivePuzzleNumber) => {
-        const desiredMode = mode ?? get().mode ?? "daily";
-        const { answer, id, puzzleNumber } = getPuzzleForMode(
-          desiredMode,
+        const current = get();
+        const started = resolveStartedGame(
+          mode,
+          current.mode,
+          current.puzzleNumber,
           archivePuzzleNumber
+        );
+        const { answer, id, puzzleNumber } = getPuzzleForMode(
+          started.mode,
+          started.puzzleNumber
         );
 
         set({
           answer,
           solutionId: id,
           puzzleNumber,
-          mode: desiredMode,
+          mode: started.mode,
           guesses: [],
           evaluations: [],
           currentGuess: "",
@@ -92,6 +103,8 @@ export const useGameStore = create<GameStoreState>()(
           invalidMessage: "",
           keyboard: {},
           gameInProgress: false,
+          resultRecorded: false,
+          gameEpoch: current.gameEpoch + 1,
         });
       },
 
@@ -124,7 +137,7 @@ export const useGameStore = create<GameStoreState>()(
       },
 
       submitGuess: async (hardMode = false) => {
-        const { currentGuess, answer, guesses, evaluations, isGameOver, isValidating } = get();
+        const { currentGuess, answer, guesses, evaluations, isGameOver, isValidating, gameEpoch } = get();
         if (isGameOver || isValidating) return;
 
         // Check word length
@@ -155,6 +168,7 @@ export const useGameStore = create<GameStoreState>()(
         // Validate against dictionary API
         set({ isValidating: true });
         const isValid = await validateWordWithAPI(guess);
+        if (get().gameEpoch !== gameEpoch) return;
         set({ isValidating: false });
 
         if (!isValid) {
@@ -218,9 +232,19 @@ export const useGameStore = create<GameStoreState>()(
     {
       name: STORAGE_KEYS.GAME,
       partialize: (state) => ({
+        answer: state.answer,
+        guesses: state.guesses,
+        evaluations: state.evaluations,
+        currentGuess: state.currentGuess,
+        currentRow: state.currentRow,
+        isGameOver: state.isGameOver,
+        isWinner: state.isWinner,
+        keyboard: state.keyboard,
+        gameInProgress: state.gameInProgress,
         mode: state.mode,
         solutionId: state.solutionId,
         puzzleNumber: state.puzzleNumber,
+        resultRecorded: state.resultRecorded,
       }),
     }
   )

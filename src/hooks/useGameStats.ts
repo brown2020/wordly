@@ -34,6 +34,7 @@ export function useGameStats() {
 
   useEffect(() => {
     if (!isGameOver) return;
+    if (useGameStore.getState().resultRecorded) return;
     const now = Date.now();
     const lastSaved = lastSavedRef.current;
     if (
@@ -77,6 +78,7 @@ export function useGameStats() {
         isWinner,
         savedAt: now,
       };
+      useGameStore.setState({ resultRecorded: true });
     } catch (err) {
       console.error("Failed to save game to localStorage:", err);
     }
