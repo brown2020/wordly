@@ -38,26 +38,50 @@ export function validateHardMode(
 ): string | null {
   if (previousGuesses.length === 0) return null;
 
-  const lastGuess = previousGuesses[previousGuesses.length - 1];
-  const lastEval = previousEvaluations[previousEvaluations.length - 1];
+  const requiredAt: Array<string | undefined> = [];
+  const requiredCounts: Record<string, number> = {};
+  const rows = Math.min(previousGuesses.length, previousEvaluations.length);
 
-  // Check that all correct letters are in the same position
-  for (let i = 0; i < lastEval.length; i++) {
-    if (lastEval[i] === "correct" && guess[i] !== lastGuess[i]) {
+  for (let row = 0; row < rows; row++) {
+    const previousGuess = previousGuesses[row];
+    const evaluation = previousEvaluations[row];
+    if (!previousGuess || !evaluation) continue;
+
+    const revealedInRow: Record<string, number> = {};
+    for (let i = 0; i < evaluation.length; i++) {
+      const letter = previousGuess[i];
+      if (!letter) continue;
+      if (evaluation[i] === "correct") {
+        requiredAt[i] = letter;
+        revealedInRow[letter] = (revealedInRow[letter] ?? 0) + 1;
+      } else if (evaluation[i] === "present") {
+        revealedInRow[letter] = (revealedInRow[letter] ?? 0) + 1;
+      }
+    }
+
+    for (const [letter, count] of Object.entries(revealedInRow)) {
+      requiredCounts[letter] = Math.max(requiredCounts[letter] ?? 0, count);
+    }
+  }
+
+  for (let i = 0; i < requiredAt.length; i++) {
+    const letter = requiredAt[i];
+    if (letter && guess[i] !== letter) {
       const pos = i + 1;
-      const letter = lastGuess[i];
       return `${pos}${getOrdinalSuffix(pos)} letter must be ${letter}`;
     }
   }
 
-  // Check that all present letters are used somewhere
-  for (let i = 0; i < lastEval.length; i++) {
-    if (lastEval[i] === "present") {
-      const letter = lastGuess[i];
-      if (!guess.includes(letter)) {
-        return `Guess must contain ${letter}`;
-      }
-    }
+  const guessCounts: Record<string, number> = {};
+  for (const letter of guess) {
+    guessCounts[letter] = (guessCounts[letter] ?? 0) + 1;
+  }
+
+  for (const [letter, count] of Object.entries(requiredCounts)) {
+    if ((guessCounts[letter] ?? 0) >= count) continue;
+    return count === 1
+      ? `Guess must contain ${letter}`
+      : `Guess must contain ${count} ${letter}s`;
   }
 
   return null;
@@ -129,6 +153,34 @@ export function getRandomAnswer(): { answer: string; id: string } {
   const ans = normalize(wordList[index]);
   const id = `rand-${Date.now()}`;
   return { answer: ans, id };
+}
+
+/**
+ * Archive play-again keeps the current puzzle. Archive with no puzzle id
+ * cannot stay in archive mode, so it starts a random game instead.
+ */
+export function resolveStartedGame(
+  requestedMode: GameMode | undefined,
+  currentMode: GameMode,
+  currentPuzzleNumber: number | null,
+  explicitPuzzleNumber?: number
+): { mode: GameMode; puzzleNumber?: number } {
+  const mode = requestedMode ?? currentMode;
+  let puzzleNumber = explicitPuzzleNumber;
+
+  if (
+    mode === "archive" &&
+    puzzleNumber === undefined &&
+    currentPuzzleNumber !== null
+  ) {
+    puzzleNumber = currentPuzzleNumber;
+  }
+
+  if (mode === "archive" && puzzleNumber === undefined) {
+    return { mode: "random" };
+  }
+
+  return { mode, puzzleNumber };
 }
 
 export function getPuzzleForMode(

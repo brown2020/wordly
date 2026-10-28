@@ -6,6 +6,7 @@ import {
   normalize,
   validateHardMode,
   getShareText,
+  resolveStartedGame,
 } from "./game-utils";
 
 describe("evaluateGuess", () => {
@@ -60,6 +61,27 @@ describe("validateHardMode", () => {
       null
     );
   });
+
+  it("keeps hints revealed before the latest guess", () => {
+    const msg = validateHardMode(
+      "CRAZE",
+      ["CANOE", "CAAEE"],
+      [
+        ["correct", "present", "present", "absent", "correct"],
+        ["correct", "absent", "correct", "absent", "correct"],
+      ]
+    );
+    assert.match(msg ?? "", /must contain N/i);
+  });
+
+  it("requires the revealed count of a repeated letter", () => {
+    const msg = validateHardMode(
+      "XXRXX",
+      ["RARER"],
+      [["present", "absent", "correct", "absent", "present"]]
+    );
+    assert.match(msg ?? "", /must contain 3 Rs/i);
+  });
 });
 
 describe("mergeKeyboardState", () => {
@@ -79,6 +101,21 @@ describe("mergeKeyboardState", () => {
       "absent",
     ]);
     assert.equal(twice.C, "correct");
+  });
+});
+
+describe("resolveStartedGame", () => {
+  it("replays the current archive puzzle when no id is passed", () => {
+    assert.deepEqual(resolveStartedGame(undefined, "archive", 10), {
+      mode: "archive",
+      puzzleNumber: 10,
+    });
+  });
+
+  it("starts random when archive has no puzzle number", () => {
+    assert.deepEqual(resolveStartedGame(undefined, "archive", null), {
+      mode: "random",
+    });
   });
 });
 
