@@ -3,6 +3,9 @@
 /* Import fonts - using system font stack like original Wordle */
 @import "tailwindcss";
 
+/* The settings toggle sets `html.dark`. Do not follow the OS media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --default-transition-duration: 200ms;
   --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -11,6 +14,22 @@
   --default-font-variation-settings: normal;
   --default-mono-font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo,
     Consolas, "Liberation Mono", monospace;
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+  --color-accent-purple: #8b5cf6;
+  --color-accent-pink: #ec4899;
+  --color-accent-orange: #f97316;
+  --shadow-soft: 0 2px 15px -3px rgb(0 0 0 / 0.07), 0 10px 20px -2px rgb(0 0 0 / 0.04);
+  --shadow-medium: 0 4px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+  --shadow-strong: 0 10px 40px -10px rgb(0 0 0 / 0.15), 0 4px 6px -2px rgb(0 0 0 / 0.05);
 }
 
 /* Base styles */
@@ -160,4 +179,21 @@ html.dark .scrollbar-thin::-webkit-scrollbar-thumb {
 
 html.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #565758;
+}
+
+.gradient-text {
+  background-image: linear-gradient(
+    to right,
+    var(--color-primary-500),
+    var(--color-primary-700)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-soft);
 }
