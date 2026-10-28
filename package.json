@@ -12,27 +12,27 @@
     "doctor": "npx -y react-doctor@latest . --verbose --yes"
   },
   "dependencies": {
-    "date-fns": "^4.1.0",
-    "next": "^16.3.6",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "zustand": "^5.0.15"
+    "date-fns": "^4.4.0",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^16.3.6",
+    "@next/eslint-plugin-next": "^16.4.3",
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/node": "^25.9.8",
+    "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.70.1",
-    "@typescript-eslint/parser": "^8.70.1",
-    "eslint": "^10.11.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
+    "eslint": "^10.13.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "postcss": "^8.5.28",
+    "postcss": "^8.5.32",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.72.1"
   }
 }
