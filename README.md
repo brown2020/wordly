@@ -28,7 +28,7 @@ No accounts, Firebase, Stripe, or environment variables.
 | State | Zustand `^5.0.16` |
 | Dates | date-fns `^4.4.0` |
 | Tests | Node.js test runner via `tsx` `^4.23.15` |
-| Lint | ESLint `^10.13.0` and typescript-eslint `^8.72.1` |
+| Lint | ESLint `^10.14.0` and typescript-eslint `^8.72.1` |
 
 ## Project structure
 

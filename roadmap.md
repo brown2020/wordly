@@ -1,6 +1,6 @@
 # Wordly roadmap
 
-Punchlist after the 28 Oct 2026 maintenance pass. Nothing here is a secret or
+Punchlist after the 2 Nov 2026 dependency pass. Nothing here is a secret or
 a deploy step. Promotion from `dev` to `main` stays a separate QA decision.
 
 ## Next steps
@@ -8,10 +8,11 @@ a deploy step. Promotion from `dev` to `main` stays a separate QA decision.
 1. Add a Playwright pass for daily, random, archive, hard mode, dark mode,
    high contrast, share, `/scores`, and a narrow viewport. Unit tests do not
    cover the browser.
-2. Move to TypeScript 7 when `typescript-eslint` can import it. TypeScript
-   `7.0.2` is current, but typescript-eslint `8.72.1` refuses TypeScript 7
-   (`require("typescript")` must stay on 6.x). The app stays on TypeScript
-   `6.0.3`.
+2. Move to TypeScript 7 when `typescript-eslint` supports it. TypeScript
+   `7.0.2` is current and `tsc` typechecks this repo, but typescript-eslint
+   `8.72.1` throws `typescript-eslint does not support TS 7.0` (supported
+   range `>=4.8.4 <6.1.0`). The app stays on TypeScript `6.0.3`, the newest
+   6.x release.
 3. Teach `/scores` the same `html.dark` theme as the game, or read the
    persisted setting on that route.
 4. Decide whether hard mode should also reject a yellow letter reused in the
@@ -35,8 +36,14 @@ a deploy step. Promotion from `dev` to `main` stays a separate QA decision.
   close on Escape. The game-over dialog does.
 - The help example says "WORDLY", which is six letters.
 - `legacy-peer-deps=true` is set so installs tolerate the TypeScript 6 /
-  typescript-eslint peer range. Do not remove it until that range includes
-  the installed TypeScript.
+  typescript-eslint peer range, and eslint-plugin-react `7.37.5` which
+  still declares ESLint `<=9`. Do not remove it until those ranges match
+  the installed packages.
+- `minimatch` `11.0.4` is overridden for `eslint`, `@eslint/config-array`,
+  and `@typescript-eslint/typescript-estree` (GHSA-g3hv-75wg-m249, fixed in
+  11.0.1). eslint-plugin-react still depends on minimatch `3.1.5` and calls
+  it as a function. Minimatch 11's CommonJS export is not that function, so
+  that copy stays on 3.1.5 and `npm audit` still reports it.
 
 ## Open issues
 

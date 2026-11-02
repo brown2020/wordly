@@ -92,11 +92,11 @@ No environment variables. No Firebase, Stripe, or server secrets.
 ## Validation
 
 - Quality gates: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
-- CI on `dev` and `main` runs those gates with Node 22. It must not inline
+- CI on `dev` and `main` runs those gates with Node 24. It must not inline
   `NEXT_PUBLIC_*` or API keys.
 - Unit tests cover evaluation, hard mode, share text, dictionary fallback,
-  score sanitizing, archive restart, a full winning submission, and the absence
-  of API routes.
+  score sanitizing, archive restart, a full winning submission, a six-guess
+  loss, a hard-mode rejection from the store, and the absence of API routes.
 - Browser coverage (daily, random, archive, themes, share, mobile) is still manual.
 
 ## Boundaries

@@ -53,6 +53,41 @@ describe("game store transitions", () => {
     assert.equal(finished.resultRecorded, false);
   });
 
+  it("ends the game after six wrong guesses", async () => {
+    useGameStore.getState().startNewGame("random");
+    useGameStore.setState({ answer: "CRANE" });
+
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      useGameStore.setState({ currentGuess: "slate" });
+      await useGameStore.getState().submitGuess(false);
+    }
+
+    const finished = useGameStore.getState();
+    assert.equal(finished.isGameOver, true);
+    assert.equal(finished.isWinner, false);
+    assert.deepEqual(
+      finished.guesses,
+      ["SLATE", "SLATE", "SLATE", "SLATE", "SLATE", "SLATE"]
+    );
+
+    useGameStore.setState({ currentGuess: "slate" });
+    await useGameStore.getState().submitGuess(false);
+    assert.equal(useGameStore.getState().guesses.length, 6);
+  });
+
+  it("rejects a hard-mode guess that drops a revealed letter", async () => {
+    useGameStore.getState().startNewGame("random");
+    useGameStore.setState({ answer: "CRANE", currentGuess: "slate" });
+    await useGameStore.getState().submitGuess(true);
+    assert.deepEqual(useGameStore.getState().guesses, ["SLATE"]);
+
+    useGameStore.setState({ currentGuess: "blitz" });
+    await useGameStore.getState().submitGuess(true);
+    const rejected = useGameStore.getState();
+    assert.equal(rejected.invalidReason, "hard_mode");
+    assert.deepEqual(rejected.guesses, ["SLATE"]);
+  });
+
   it("rejects a short guess before calling the dictionary", async () => {
     useGameStore.getState().startNewGame("daily");
     useGameStore.setState({ currentGuess: "cat" });
