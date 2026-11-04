@@ -22,8 +22,8 @@ No accounts, Firebase, Stripe, or environment variables.
 
 | Layer | Choice |
 | --- | --- |
-| Framework | Next.js `^16.4.3` (App Router) |
-| UI | React `^19.3.1`, Tailwind CSS `^4.3.3` |
+| Framework | Next.js `^16.4.5` (App Router) |
+| UI | React `^19.3.1`, Tailwind CSS `^4.3.4` |
 | Language | TypeScript `^6.0.3` |
 | State | Zustand `^5.0.16` |
 | Dates | date-fns `^4.4.0` |

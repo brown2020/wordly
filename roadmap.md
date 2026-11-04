@@ -39,6 +39,8 @@ a deploy step. Promotion from `dev` to `main` stays a separate QA decision.
   typescript-eslint peer range, and eslint-plugin-react `7.37.5` which
   still declares ESLint `<=9`. Do not remove it until those ranges match
   the installed packages.
+- `@types/node` stays on 24.x (`^24.19.2`) so the types match the Node 24
+  runtime. Do not move it to 26.x.
 - `minimatch` `11.0.4` is overridden for `eslint`, `@eslint/config-array`,
   and `@typescript-eslint/typescript-estree` (GHSA-g3hv-75wg-m249, fixed in
   11.0.1). eslint-plugin-react still depends on minimatch `3.1.5` and calls
